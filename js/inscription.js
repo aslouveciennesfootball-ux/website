@@ -231,12 +231,8 @@ function initAdherentLookup() {
 
 async function rechercherAdherent(nom, prenom) {
   try {
-    const response = await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify({ route: 'recherche-adherent', nom, prenom })
-    });
-
+    const params = new URLSearchParams({ action: 'recherche-adherent', nom, prenom });
+    const response = await fetch(`${API_URL}?${params}`);
     const result = await response.json();
 
     if (result.status === 'found') {

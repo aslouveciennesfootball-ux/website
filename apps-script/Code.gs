@@ -24,6 +24,15 @@ const CONFIG = {
 // ─── Point d'entrée GET (test) ───────────────────────────────────
 
 function doGet(e) {
+  const action = (e.parameter && e.parameter.action) || '';
+
+  if (action === 'recherche-adherent') {
+    return handleRechercheAdherent({
+      nom: e.parameter.nom || '',
+      prenom: e.parameter.prenom || ''
+    });
+  }
+
   return jsonResponse({ status: 'ok', message: 'API ASL Louveciennes active' });
 }
 
