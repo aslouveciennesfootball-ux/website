@@ -222,7 +222,10 @@ Message envoyé depuis le formulaire de contact du site aslouveciennes.fr
 function handleRechercheAdherent(data) {
   try {
     const ss = SpreadsheetApp.openById(CONFIG.SHEET_ADHERENTS);
-    const sheetNames = ss.getSheets().map(s => s.getName());
+    const sheets = ss.getSheets();
+
+    // Ne chercher que dans les onglets de saison (ex: "2025-2026", "2024-2025")
+    const saisonSheets = sheets.filter(s => /^\d{4}-\d{4}$/.test(s.getName().trim()));
 
     const nomRecherche = (data.nom || '').trim().toUpperCase();
     const prenomRecherche = (data.prenom || '').trim().toUpperCase();
@@ -231,8 +234,11 @@ function handleRechercheAdherent(data) {
       return jsonResponse({ status: 'not_found' });
     }
 
-    for (const sheetName of sheetNames) {
-      const sheet = ss.getSheetByName(sheetName);
+    // Chercher en priorité dans la saison la plus récente
+    saisonSheets.sort((a, b) => b.getName().localeCompare(a.getName()));
+
+    for (const sheet of saisonSheets) {
+      const sheetName = sheet.getName();
       if (sheet.getLastRow() < 2) continue;
 
       const allData = sheet.getDataRange().getValues();
@@ -241,7 +247,7 @@ function handleRechercheAdherent(data) {
       // Recherche robuste des colonnes (gère typos et accents)
       const colNom = findCol(headers, ['nom de l', 'nom'], ['prenom', 'urgence', 'lieu']);
       const colPrenom = findCol(headers, ['prenom', 'prénom']);
-      const colLicence = findCol(headers, ['licence', 'liccen', 'licen', 'lic']);
+      const colLicence = findCol(headers, ['numero de lic', 'n° de lic', 'n°de lic', 'numero de liccen']);
       const colEmail = findCol(headers, ['mail', 'email'], ['2nd', '2eme', '2e ']);
       const colTel = findCol(headers, ['telephone de contact', 'telephone', 'tel de contact']);
       const colAdresse = findCol(headers, ['adresse']);
@@ -287,30 +293,34 @@ function findCol(headers, includes, excludes) {
 // Fonction de test — exécuter depuis l'éditeur pour vérifier
 function testRecherche() {
   const ss = SpreadsheetApp.openById(CONFIG.SHEET_ADHERENTS);
-  const sheets = ss.getSheets();
+  const sheets = ss.getSheets().filter(s => /^\d{4}-\d{4}$/.test(s.getName().trim()));
+
+  Logger.log('=== Onglets saison trouvés: ' + sheets.map(s => s.getName()).join(', '));
 
   for (const sheet of sheets) {
     const name = sheet.getName();
-    const lastRow = sheet.getLastRow();
-    Logger.log('Onglet: ' + name + ' — Lignes: ' + lastRow);
-
-    if (lastRow < 2) continue;
-
     const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
-    Logger.log('Headers: ' + JSON.stringify(headers));
+    const headersNorm = headers.map(h => String(h).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim());
 
-    // Afficher les 3 premières lignes de données
-    if (lastRow >= 2) {
-      const rows = sheet.getRange(2, 1, Math.min(3, lastRow - 1), sheet.getLastColumn()).getValues();
-      rows.forEach((row, i) => {
-        Logger.log('Ligne ' + (i+2) + ': nom=' + row[1] + ', prenom=' + row[2] + ', licence=' + row[14]);
-      });
+    const colNom = findCol(headersNorm, ['nom de l', 'nom'], ['prenom', 'urgence', 'lieu']);
+    const colPrenom = findCol(headersNorm, ['prenom', 'prénom']);
+    const colLicence = findCol(headersNorm, ['licence', 'liccen', 'licen', 'lic']);
+
+    Logger.log(name + ' → colNom=' + colNom + ' (' + headers[colNom] + '), colPrenom=' + colPrenom + ' (' + headers[colPrenom] + '), colLicence=' + colLicence + ' (' + headers[colLicence] + ')');
+
+    // Chercher tous les "Ollivon" dans cet onglet
+    const allData = sheet.getDataRange().getValues();
+    for (let i = 1; i < allData.length; i++) {
+      const nom = String(allData[i][colNom] || '').trim().toUpperCase();
+      if (nom.includes('OLLIV')) {
+        Logger.log('  TROUVÉ ligne ' + (i+1) + ': ' + nom + ' / ' + allData[i][colPrenom] + ' / licence=' + allData[i][colLicence]);
+      }
     }
   }
 
-  // Test de recherche
+  // Test API
   const result = handleRechercheAdherent({ nom: 'Ollivon', prenom: 'Kamerone' });
-  Logger.log('Résultat recherche: ' + result.getContent());
+  Logger.log('=== Résultat API: ' + result.getContent());
 }
 
 // ─── Helpers : Sheets ───────────────────────────────────────────
