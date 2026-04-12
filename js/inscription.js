@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initFileUploads();
   initOptionToggles();
   initAdherentLookup();
+  initLieuNaissanceAutocomplete();
   initCodePostalAutocomplete();
   initFormSubmit();
 });
@@ -118,6 +119,56 @@ function initOptionToggles() {
     cb.addEventListener('change', () => {
       el.style.display = cb.checked ? 'block' : 'none';
     });
+  });
+}
+
+// ─── Autocomplétion Lieu de naissance (geo.api.gouv.fr) ──────────
+
+function initLieuNaissanceAutocomplete() {
+  var input = document.getElementById('lieuNaissance');
+  var list = document.getElementById('lieuNaissanceSuggestions');
+  if (!input || !list) return;
+
+  var debounce;
+
+  function onInput() {
+    clearTimeout(debounce);
+    var txt = input.value.trim();
+    // Chercher dès 2 caractères alphabétiques
+    var letters = txt.replace(/[^a-zA-ZÀ-ÿ]/g, '');
+    if (letters.length < 2) { list.style.display = 'none'; return; }
+
+    debounce = setTimeout(function() {
+      fetch('https://geo.api.gouv.fr/communes?nom=' + encodeURIComponent(txt) + '&fields=nom,codesPostaux,departement&limit=8')
+        .then(function(res) { return res.json(); })
+        .then(function(communes) {
+          if (!communes.length) { list.style.display = 'none'; return; }
+
+          list.innerHTML = communes.map(function(c) {
+            var cp = c.codesPostaux[0] || '';
+            var label = c.nom + ' ' + cp;
+            return '<div class="autocomplete-item" data-value="' + label + '">' + c.nom + ' — ' + cp + '</div>';
+          }).join('');
+          list.style.display = 'block';
+
+          list.querySelectorAll('.autocomplete-item').forEach(function(item) {
+            item.addEventListener('click', function() {
+              input.value = item.dataset.value;
+              list.style.display = 'none';
+            });
+          });
+        })
+        .catch(function() { list.style.display = 'none'; });
+    }, 250);
+  }
+
+  input.addEventListener('input', onInput);
+  input.addEventListener('keyup', onInput);
+
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('#lieuNaissance') && !e.target.closest('#lieuNaissanceSuggestions')) {
+      list.style.display = 'none';
+    }
   });
 }
 
