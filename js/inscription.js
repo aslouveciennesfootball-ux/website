@@ -1,20 +1,21 @@
 /**
  * ASL Louveciennes — Formulaire d'inscription multi-étapes
- * Étape 1 : Joueur (nom, prénom, date naissance, sexe, catégorie auto)
- * Étape 2 : Coordonnées (email, tél, adresse, contact urgence)
- * Étape 3 : Documents (certificat médical, photo, autorisation parentale)
+ * Étape 1 : Joueur (nom, prénom, date naissance, sexe, lieu, nationalité, licence)
+ * Étape 2 : Responsable légal (adresse, contacts, WhatsApp, urgence)
+ * Étape 3 : Options & Réductions (équipement, Pass'Sport, Pass+, PF, QS, règlement)
+ * Étape 4 : Documents & Autorisations (certificat, photo, droit image, infos médicales)
  */
 
-// URL de la Web App Google Apps Script (à remplacer après déploiement)
 const API_URL = 'https://script.google.com/macros/s/AKfycbzmrtVgeQLGzsm93kiwQmJ49tYaSn4SpUr9yV40JwM5bqtbIro3C_1QFPn5O62nrwW1_g/exec';
 
 let currentStep = 1;
-const totalSteps = 3;
+const totalSteps = 4;
 
 document.addEventListener('DOMContentLoaded', () => {
   initStepper();
   initDateNaissance();
   initFileUploads();
+  initOptionToggles();
   initFormSubmit();
 });
 
@@ -37,16 +38,12 @@ function initStepper() {
 function goToStep(step) {
   if (step < 1 || step > totalSteps) return;
 
-  // Masquer étape courante
   document.querySelector(`.form-step[data-step="${currentStep}"]`).classList.remove('active');
-  // Afficher nouvelle étape
   document.querySelector(`.form-step[data-step="${step}"]`).classList.add('active');
 
-  // Mettre à jour stepper visuel
   updateStepperUI(step);
   currentStep = step;
 
-  // Scroll vers le haut du formulaire
   document.querySelector('.inscription-form').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
@@ -89,27 +86,37 @@ function calculateCategorie(dateStr) {
   if (!dateStr) return null;
 
   const birthDate = new Date(dateStr);
-  const now = new Date();
-
-  // Saison = année civile de fin de saison (ex: saison 2026-2027, on regarde l'âge au 1er janvier 2027)
   const saisonYear = 2027;
   const age = saisonYear - birthDate.getFullYear();
 
   if (age < 5) return null;
-  if (age <= 6) return 'U7';
-  if (age <= 7) return 'U8';
-  if (age <= 8) return 'U9';
-  if (age <= 9) return 'U10';
-  if (age <= 10) return 'U11';
-  if (age <= 11) return 'U12';
-  if (age <= 12) return 'U13';
-  if (age <= 13) return 'U14';
-  if (age <= 14) return 'U15';
-  if (age <= 15) return 'U16';
-  if (age <= 16) return 'U17';
-  if (age <= 17) return 'U18';
-  if (age <= 18) return 'U19';
-  return 'Senior';
+  if (age <= 6) return 'U6-U7';
+  if (age <= 8) return 'U8-U9';
+  if (age <= 10) return 'U10-U11';
+  if (age <= 12) return 'U12-U13';
+  if (age <= 14) return 'U14-U15';
+  return null; // Pas de U16+ cette saison
+}
+
+// ─── Option Toggles ─────────────────────────────────────────────
+
+function initOptionToggles() {
+  const toggles = [
+    { checkbox: 'passSport', target: 'passSportNumeroGroup' },
+    { checkbox: 'passPlus', target: 'passPlusNumeroGroup' },
+    { checkbox: 'cartePF', target: 'cartePFGroup' },
+    { checkbox: 'reductionQS', target: 'reductionQSGroup' }
+  ];
+
+  toggles.forEach(({ checkbox, target }) => {
+    const cb = document.getElementById(checkbox);
+    const el = document.getElementById(target);
+    if (!cb || !el) return;
+
+    cb.addEventListener('change', () => {
+      el.style.display = cb.checked ? 'block' : 'none';
+    });
+  });
 }
 
 // ─── File Upload ────────────────────────────────────────────────
@@ -126,7 +133,6 @@ function initFileUploads() {
         return;
       }
 
-      // Vérifier taille (5 MB max)
       if (file.size > 5 * 1024 * 1024) {
         showFieldError(input, 'Le fichier ne doit pas dépasser 5 Mo.');
         input.value = '';
@@ -161,13 +167,30 @@ function validateStep(step) {
   requiredFields.forEach(field => {
     clearFieldError(field);
 
+    // Checkbox
+    if (field.type === 'checkbox') {
+      if (!field.checked) {
+        showFieldError(field, 'Ce champ est obligatoire.');
+        valid = false;
+      }
+      return;
+    }
+
+    // File
+    if (field.type === 'file') {
+      if (!field.files || !field.files.length) {
+        showFieldError(field, 'Ce document est obligatoire.');
+        valid = false;
+      }
+      return;
+    }
+
     if (!field.value.trim()) {
       showFieldError(field, 'Ce champ est obligatoire.');
       valid = false;
       return;
     }
 
-    // Validations spécifiques
     if (field.type === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(field.value)) {
       showFieldError(field, 'Email invalide.');
       valid = false;
@@ -181,11 +204,21 @@ function validateStep(step) {
     if (field.id === 'dateNaissance') {
       const cat = calculateCategorie(field.value);
       if (!cat) {
-        showFieldError(field, 'Date de naissance invalide ou âge non éligible.');
+        showFieldError(field, 'Date de naissance invalide ou catégorie non disponible cette saison (U6 à U15 uniquement).');
         valid = false;
       }
     }
   });
+
+  // Validation conditionnelle Pass'Sport numéro
+  if (step === 3) {
+    const passSport = document.getElementById('passSport');
+    const passSportNum = document.getElementById('passSportNumero');
+    if (passSport && passSport.checked && passSportNum && !passSportNum.value.trim()) {
+      showFieldError(passSportNum, 'Numéro Pass\'Sport requis.');
+      valid = false;
+    }
+  }
 
   return valid;
 }
@@ -213,7 +246,7 @@ function initFormSubmit() {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    if (!validateStep(3)) return;
+    if (!validateStep(4)) return;
 
     const submitBtn = form.querySelector('.btn-submit');
     const originalText = submitBtn.textContent;
@@ -221,7 +254,6 @@ function initFormSubmit() {
     submitBtn.innerHTML = '<span class="spinner"></span> Envoi en cours...';
 
     try {
-      // Convertir fichiers en base64
       const certFile = document.getElementById('certificat').files[0];
       const photoFile = document.getElementById('photo').files[0];
 
@@ -232,31 +264,52 @@ function initFormSubmit() {
 
       const payload = {
         route: 'inscription',
+        // Joueur
         nom: document.getElementById('nom').value.trim(),
         prenom: document.getElementById('prenom').value.trim(),
         dateNaissance: document.getElementById('dateNaissance').value,
         sexe: document.getElementById('sexe').value,
         categorie: document.getElementById('categorie').value,
+        lieuNaissance: document.getElementById('lieuNaissance').value.trim(),
+        nationalite: document.getElementById('nationalite').value.trim(),
+        numeroLicence: document.getElementById('numeroLicence').value.trim(),
+        // Responsable
+        adresse: document.getElementById('adresse').value.trim(),
         email: document.getElementById('email').value.trim(),
         telephone: document.getElementById('telephone').value.trim(),
-        adresse: document.getElementById('adresse').value.trim(),
-        codePostal: document.getElementById('codePostal').value.trim(),
-        ville: document.getElementById('ville').value.trim(),
+        whatsapp1: document.getElementById('whatsapp1').checked,
+        email2: document.getElementById('email2').value.trim(),
+        telephone2: document.getElementById('telephone2').value.trim(),
+        whatsapp2: document.getElementById('whatsapp2').checked,
         contactUrgenceNom: document.getElementById('contactUrgenceNom').value.trim(),
         contactUrgenceTel: document.getElementById('contactUrgenceTel').value.trim(),
+        // Options
+        equipement: document.getElementById('equipement').checked,
+        passSport: document.getElementById('passSport').checked,
+        passSportNumero: document.getElementById('passSportNumero').value.trim(),
+        passPlus: document.getElementById('passPlus').checked,
+        passPlusNumero: document.getElementById('passPlusNumero').value.trim(),
+        cartePF: document.getElementById('cartePF').checked,
+        cartePFNumero: document.getElementById('cartePFNumero').value.trim(),
+        cartePFTaux: document.getElementById('cartePFTaux').value,
+        reductionQS: document.getElementById('reductionQS').checked,
+        reductionQSTaux: document.getElementById('reductionQSTaux').value,
+        reglement: document.getElementById('reglement').value,
+        // Documents & autorisations
         certificat: certificat,
         photo: photo,
-        autorisationParentale: document.getElementById('autorisationParentale').checked
+        autorisationImage: document.getElementById('autorisationImage').checked,
+        autorisationParentale: document.getElementById('autorisationParentale').checked,
+        infosMedicales: document.getElementById('infosMedicales').value.trim()
       };
 
-      const response = await fetch(API_URL, {
+      await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
         mode: 'no-cors'
       });
 
-      // En mode no-cors, on ne peut pas lire la réponse, on assume le succès
       showSuccessMessage();
 
     } catch (err) {
@@ -276,7 +329,8 @@ function showSuccessMessage() {
       <div style="font-size:3rem;margin-bottom:var(--sp-4);">✅</div>
       <h3 style="margin-bottom:var(--sp-4);">Inscription envoyée avec succès !</h3>
       <p>Nous avons bien reçu l'inscription. Un email de confirmation a été envoyé.</p>
-      <p style="margin-top:var(--sp-4);">L'inscription sera validée après vérification des documents.</p>
+      <p style="margin-top:var(--sp-4);">L'inscription sera validée après vérification des documents et réception du règlement.</p>
+      <p style="margin-top:var(--sp-2);font-size:var(--fs-sm);color:var(--gris-500);">IBAN : FR76 3000 3019 0200 0372 8306 293</p>
       <a href="index.html" class="btn btn--primary" style="margin-top:var(--sp-6);">Retour à l'accueil</a>
     </div>
   `;

@@ -66,11 +66,16 @@
         <div class="stepper__line"></div>
         <div class="stepper__step">
           <div class="stepper__number">2</div>
-          <span class="stepper__label">Coordonnées</span>
+          <span class="stepper__label">Responsable</span>
         </div>
         <div class="stepper__line"></div>
         <div class="stepper__step">
           <div class="stepper__number">3</div>
+          <span class="stepper__label">Options</span>
+        </div>
+        <div class="stepper__line"></div>
+        <div class="stepper__step">
+          <div class="stepper__number">4</div>
           <span class="stepper__label">Documents</span>
         </div>
       </div>
@@ -111,6 +116,19 @@
             </div>
           </div>
 
+          <div class="form-row form-row--2">
+            <div class="form-group">
+              <label for="lieuNaissance">Lieu de naissance + CP <span class="required">*</span></label>
+              <input type="text" id="lieuNaissance" class="form-input" required placeholder="ex : Versailles 78000">
+              <div class="form-error"></div>
+            </div>
+            <div class="form-group">
+              <label for="nationalite">Nationalité <span class="required">*</span></label>
+              <input type="text" id="nationalite" class="form-input" required value="Française">
+              <div class="form-error"></div>
+            </div>
+          </div>
+
           <!-- Catégorie auto-calculée -->
           <div class="categorie-result" style="display:none;">
             <div class="categorie-result__label">Catégorie calculée automatiquement</div>
@@ -118,19 +136,33 @@
           </div>
           <input type="hidden" id="categorie" name="categorie">
 
+          <div class="form-group">
+            <label for="numeroLicence">Numéro de licence <em>(réinscription uniquement)</em></label>
+            <input type="text" id="numeroLicence" class="form-input" placeholder="Si vous avez déjà une licence FFF">
+          </div>
+
           <div style="display:flex;justify-content:flex-end;margin-top:var(--sp-8);">
             <button type="button" class="btn btn--primary step-next">Suivant &rarr;</button>
           </div>
         </div>
 
-        <!-- ÉTAPE 2 : Coordonnées -->
+        <!-- ÉTAPE 2 : Responsable légal -->
         <div class="form-step" data-step="2">
-          <h2 style="font-size:var(--fs-2xl);margin-bottom:var(--sp-6);">Coordonnées</h2>
+          <h2 style="font-size:var(--fs-2xl);margin-bottom:var(--sp-6);">Responsable légal</h2>
+
+          <div class="form-group">
+            <label for="adresse">Adresse postale + CP + Ville <span class="required">*</span></label>
+            <input type="text" id="adresse" class="form-input" required autocomplete="street-address" placeholder="ex : 11 parc du château 78430 Louveciennes">
+            <div class="form-error"></div>
+          </div>
+
+          <h3 style="font-size:var(--fs-lg);margin:var(--sp-6) 0 var(--sp-4);">Contact principal</h3>
 
           <div class="form-row form-row--2">
             <div class="form-group">
               <label for="email">Email <span class="required">*</span></label>
               <input type="email" id="email" class="form-input" required autocomplete="email">
+              <div class="form-hint">L'email de validation de la licence sera envoyé à cette adresse.</div>
               <div class="form-error"></div>
             </div>
             <div class="form-group">
@@ -141,22 +173,30 @@
           </div>
 
           <div class="form-group">
-            <label for="adresse">Adresse <span class="required">*</span></label>
-            <input type="text" id="adresse" class="form-input" required autocomplete="street-address">
-            <div class="form-error"></div>
+            <label style="display:flex;align-items:center;gap:var(--sp-3);cursor:pointer;">
+              <input type="checkbox" id="whatsapp1" style="width:18px;height:18px;flex-shrink:0;">
+              <span>J'autorise l'utilisation de ce numéro pour le groupe WhatsApp de l'équipe</span>
+            </label>
           </div>
+
+          <h3 style="font-size:var(--fs-lg);margin:var(--sp-6) 0 var(--sp-4);">Second contact</h3>
 
           <div class="form-row form-row--2">
             <div class="form-group">
-              <label for="codePostal">Code postal <span class="required">*</span></label>
-              <input type="text" id="codePostal" class="form-input" required autocomplete="postal-code" maxlength="5">
-              <div class="form-error"></div>
+              <label for="email2">2e adresse email</label>
+              <input type="email" id="email2" class="form-input">
             </div>
             <div class="form-group">
-              <label for="ville">Ville <span class="required">*</span></label>
-              <input type="text" id="ville" class="form-input" required autocomplete="address-level2">
-              <div class="form-error"></div>
+              <label for="telephone2">2e numéro de téléphone</label>
+              <input type="tel" id="telephone2" class="form-input" placeholder="06 12 34 56 78">
             </div>
+          </div>
+
+          <div class="form-group">
+            <label style="display:flex;align-items:center;gap:var(--sp-3);cursor:pointer;">
+              <input type="checkbox" id="whatsapp2" style="width:18px;height:18px;flex-shrink:0;">
+              <span>J'autorise l'utilisation de ce 2e numéro pour WhatsApp</span>
+            </label>
           </div>
 
           <h3 style="font-size:var(--fs-lg);margin:var(--sp-8) 0 var(--sp-4);color:var(--rouge);">Contact d'urgence</h3>
@@ -180,9 +220,94 @@
           </div>
         </div>
 
-        <!-- ÉTAPE 3 : Documents -->
+        <!-- ÉTAPE 3 : Options & Réductions -->
         <div class="form-step" data-step="3">
-          <h2 style="font-size:var(--fs-2xl);margin-bottom:var(--sp-6);">Documents</h2>
+          <h2 style="font-size:var(--fs-2xl);margin-bottom:var(--sp-6);">Options & Réductions</h2>
+
+          <h3 style="font-size:var(--fs-lg);margin-bottom:var(--sp-4);">Équipement</h3>
+          <div class="form-group">
+            <label style="display:flex;align-items:center;gap:var(--sp-3);cursor:pointer;">
+              <input type="checkbox" id="equipement" style="width:18px;height:18px;flex-shrink:0;">
+              <span>Je souhaite commander l'équipement du club (+53 €)</span>
+            </label>
+            <div class="form-hint">Maillot + short + chaussettes aux couleurs de l'ASL.</div>
+          </div>
+
+          <h3 style="font-size:var(--fs-lg);margin:var(--sp-8) 0 var(--sp-4);">Réductions</h3>
+
+          <div class="form-group">
+            <label style="display:flex;align-items:center;gap:var(--sp-3);cursor:pointer;">
+              <input type="checkbox" id="passSport" style="width:18px;height:18px;flex-shrink:0;">
+              <span>Pass'Sport (déduction de 50 €)</span>
+            </label>
+          </div>
+          <div class="form-group" id="passSportNumeroGroup" style="display:none;">
+            <label for="passSportNumero">Numéro Pass'Sport <span class="required">*</span></label>
+            <input type="text" id="passSportNumero" class="form-input" placeholder="Numéro figurant sur votre notification">
+            <div class="form-error"></div>
+          </div>
+
+          <div class="form-group">
+            <label style="display:flex;align-items:center;gap:var(--sp-3);cursor:pointer;">
+              <input type="checkbox" id="passPlus" style="width:18px;height:18px;flex-shrink:0;">
+              <span>Pass+ (LABAZ)</span>
+            </label>
+          </div>
+          <div class="form-group" id="passPlusNumeroGroup" style="display:none;">
+            <label for="passPlusNumero">Numéro Pass+</label>
+            <input type="text" id="passPlusNumero" class="form-input">
+          </div>
+
+          <div class="form-group">
+            <label style="display:flex;align-items:center;gap:var(--sp-3);cursor:pointer;">
+              <input type="checkbox" id="cartePF" style="width:18px;height:18px;flex-shrink:0;">
+              <span>Carte Passion Football (réduction PF)</span>
+            </label>
+          </div>
+          <div class="form-row form-row--2" id="cartePFGroup" style="display:none;">
+            <div class="form-group">
+              <label for="cartePFNumero">Numéro de carte PF</label>
+              <input type="text" id="cartePFNumero" class="form-input">
+            </div>
+            <div class="form-group">
+              <label for="cartePFTaux">Taux de réduction (%)</label>
+              <input type="number" id="cartePFTaux" class="form-input" min="0" max="100">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label style="display:flex;align-items:center;gap:var(--sp-3);cursor:pointer;">
+              <input type="checkbox" id="reductionQS" style="width:18px;height:18px;flex-shrink:0;">
+              <span>Réduction Quotient Social (QS)</span>
+            </label>
+          </div>
+          <div class="form-group" id="reductionQSGroup" style="display:none;">
+            <label for="reductionQSTaux">Taux de réduction QS (%)</label>
+            <input type="number" id="reductionQSTaux" class="form-input" min="0" max="100">
+          </div>
+
+          <h3 style="font-size:var(--fs-lg);margin:var(--sp-8) 0 var(--sp-4);">Mode de règlement</h3>
+          <div class="form-group">
+            <label for="reglement">Mode de règlement souhaité <span class="required">*</span></label>
+            <select id="reglement" class="form-select" required>
+              <option value="">Sélectionner</option>
+              <option value="Virement">Virement bancaire</option>
+              <option value="Chèque">Chèque</option>
+              <option value="Espèces">Espèces</option>
+            </select>
+            <div class="form-hint">Virement : FR76 3000 3019 0200 0372 8306 293 — Libellé : NOM Prénom année de naissance. Possibilité de payer en 3 fois.</div>
+            <div class="form-error"></div>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;margin-top:var(--sp-8);">
+            <button type="button" class="btn btn--outline step-prev">&larr; Précédent</button>
+            <button type="button" class="btn btn--primary step-next">Suivant &rarr;</button>
+          </div>
+        </div>
+
+        <!-- ÉTAPE 4 : Documents & Autorisations -->
+        <div class="form-step" data-step="4">
+          <h2 style="font-size:var(--fs-2xl);margin-bottom:var(--sp-6);">Documents & Autorisations</h2>
 
           <div class="form-group">
             <label>Certificat médical <span class="required">*</span></label>
@@ -192,25 +317,41 @@
               <div class="file-upload__text">Cliquez ou glissez votre certificat médical ici<br><small>PDF, JPG ou PNG — 5 Mo max</small></div>
               <div class="file-upload__name"></div>
             </div>
+            <div class="form-hint">Certificat de non contre-indication à la pratique du football en compétition.</div>
             <div class="form-error"></div>
           </div>
 
           <div class="form-group">
-            <label>Photo d'identité</label>
+            <label>Photo d'identité <span class="required">*</span></label>
             <div class="file-upload">
-              <input type="file" id="photo" accept=".jpg,.jpeg,.png">
+              <input type="file" id="photo" accept=".jpg,.jpeg,.png" required>
               <div class="file-upload__icon">📷</div>
               <div class="file-upload__text">Cliquez ou glissez une photo d'identité<br><small>JPG ou PNG — 5 Mo max</small></div>
               <div class="file-upload__name"></div>
             </div>
+            <div class="form-error"></div>
           </div>
 
-          <div class="form-group" style="margin-top:var(--sp-6);">
+          <h3 style="font-size:var(--fs-lg);margin:var(--sp-8) 0 var(--sp-4);">Autorisations</h3>
+
+          <div class="form-group">
+            <label style="display:flex;align-items:flex-start;gap:var(--sp-3);cursor:pointer;">
+              <input type="checkbox" id="autorisationImage" style="margin-top:4px;width:18px;height:18px;flex-shrink:0;">
+              <span>J'autorise la diffusion de l'image de mon enfant dans le cadre des activités du club (site web, réseaux sociaux, presse locale).</span>
+            </label>
+          </div>
+
+          <div class="form-group">
             <label style="display:flex;align-items:flex-start;gap:var(--sp-3);cursor:pointer;">
               <input type="checkbox" id="autorisationParentale" style="margin-top:4px;width:18px;height:18px;flex-shrink:0;" required>
-              <span>J'autorise mon enfant à participer aux activités de l'AS Louveciennes Football et certifie l'exactitude des informations fournies. <span class="required">*</span></span>
+              <span>J'autorise mon enfant à participer aux entraînements et compétitions de l'AS Louveciennes Football et certifie l'exactitude des informations fournies. <span class="required">*</span></span>
             </label>
             <div class="form-error"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="infosMedicales">Allergies / Informations médicales importantes</label>
+            <textarea id="infosMedicales" class="form-textarea" rows="3" placeholder="Signalez toute allergie, traitement ou information importante pour les éducateurs..."></textarea>
           </div>
 
           <div style="display:flex;justify-content:space-between;margin-top:var(--sp-8);">
