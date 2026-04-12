@@ -24,12 +24,14 @@ const CONFIG = {
 // ─── Point d'entrée GET (test) ───────────────────────────────────
 
 function doGet(e) {
-  const action = (e.parameter && e.parameter.action) || '';
+  e = e || {};
+  const params = e.parameter || {};
+  const action = params.action || '';
 
   if (action === 'recherche-adherent') {
     return handleRechercheAdherent({
-      nom: e.parameter.nom || '',
-      prenom: e.parameter.prenom || ''
+      nom: params.nom || '',
+      prenom: params.prenom || ''
     });
   }
 
