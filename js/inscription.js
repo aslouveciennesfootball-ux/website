@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initDateNaissance();
   initFileUploads();
   initOptionToggles();
+  initAdherentLookup();
   initFormSubmit();
 });
 
@@ -117,6 +118,75 @@ function initOptionToggles() {
       el.style.display = cb.checked ? 'block' : 'none';
     });
   });
+}
+
+// ─── Recherche adhérent existant ─────────────────────────────────
+
+let lookupDone = false;
+
+function initAdherentLookup() {
+  const nomField = document.getElementById('nom');
+  const prenomField = document.getElementById('prenom');
+  if (!nomField || !prenomField) return;
+
+  const doLookup = () => {
+    const nom = nomField.value.trim();
+    const prenom = prenomField.value.trim();
+    if (!nom || !prenom || lookupDone) return;
+    lookupDone = true;
+    rechercherAdherent(nom, prenom);
+  };
+
+  // Déclencher à la perte de focus du prénom (les 2 champs sont remplis)
+  prenomField.addEventListener('blur', doLookup);
+  nomField.addEventListener('blur', () => {
+    if (prenomField.value.trim()) doLookup();
+  });
+}
+
+async function rechercherAdherent(nom, prenom) {
+  try {
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ route: 'recherche-adherent', nom, prenom })
+    });
+
+    const result = await response.json();
+
+    if (result.status === 'found') {
+      // Pré-remplir les champs trouvés
+      if (result.numeroLicence) {
+        document.getElementById('numeroLicence').value = result.numeroLicence;
+      }
+      if (result.email) {
+        document.getElementById('email').value = result.email;
+      }
+      if (result.telephone) {
+        const tel = String(result.telephone).replace(/^0?(\d)/, '0$1');
+        document.getElementById('telephone').value = tel;
+      }
+      if (result.adresse) {
+        document.getElementById('adresse').value = result.adresse;
+      }
+      if (result.nationalite) {
+        document.getElementById('nationalite').value = result.nationalite;
+      }
+
+      // Notification visuelle
+      const hint = document.createElement('div');
+      hint.className = 'alert alert--success';
+      hint.style.cssText = 'margin-top:var(--sp-4);font-size:var(--fs-sm);';
+      hint.textContent = `Adhérent trouvé (saison ${result.saison}). Vos informations ont été pré-remplies. Vérifiez et complétez si nécessaire.`;
+      const step1 = document.querySelector('.form-step[data-step="1"]');
+      const existingHint = step1.querySelector('.alert--success');
+      if (existingHint) existingHint.remove();
+      step1.querySelector('h2').after(hint);
+    }
+  } catch (err) {
+    // Silencieux — la recherche est un bonus, pas critique
+    console.log('Recherche adhérent:', err.message);
+  }
 }
 
 // ─── File Upload ────────────────────────────────────────────────

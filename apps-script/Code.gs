@@ -41,6 +41,8 @@ function doPost(e) {
         return handleInscriptionStage(data);
       case 'contact':
         return handleContact(data);
+      case 'recherche-adherent':
+        return handleRechercheAdherent(data);
       default:
         return jsonResponse({ status: 'error', message: 'Route inconnue : ' + route }, 400);
     }
@@ -200,6 +202,61 @@ Message envoyé depuis le formulaire de contact du site aslouveciennes.fr
     status: 'success',
     message: 'Votre message a été envoyé. Nous vous répondrons dans les meilleurs délais.'
   });
+}
+
+// ─── Recherche Adhérent (pré-remplissage) ───────────────────────
+
+function handleRechercheAdherent(data) {
+  const ss = SpreadsheetApp.openById(CONFIG.SHEET_ADHERENTS);
+  // Chercher dans tous les onglets contenant des adhérents
+  const sheetNames = ss.getSheets().map(s => s.getName());
+
+  const nomRecherche = (data.nom || '').trim().toUpperCase();
+  const prenomRecherche = (data.prenom || '').trim().toUpperCase();
+
+  if (!nomRecherche || !prenomRecherche) {
+    return jsonResponse({ status: 'not_found' });
+  }
+
+  for (const sheetName of sheetNames) {
+    const sheet = ss.getSheetByName(sheetName);
+    if (sheet.getLastRow() < 2) continue;
+
+    const allData = sheet.getDataRange().getValues();
+    const headers = allData[0].map(h => String(h).toLowerCase().trim());
+
+    // Trouver les indices des colonnes
+    const colNom = headers.findIndex(h => h.includes('nom') && !h.includes('prenom') && !h.includes('prénom') && !h.includes('urgence') && !h.includes('lieu'));
+    const colPrenom = headers.findIndex(h => h.includes('prenom') || h.includes('prénom'));
+    const colLicence = headers.findIndex(h => h.includes('licence') || h.includes('licen'));
+    const colEmail = headers.findIndex(h => h.includes('mail') && !h.includes('2'));
+    const colTel = headers.findIndex(h => h.includes('telephone') || h.includes('tel'));
+    const colAdresse = headers.findIndex(h => h.includes('adresse'));
+    const colNationalite = headers.findIndex(h => h.includes('nationalit'));
+
+    if (colNom === -1 || colPrenom === -1) continue;
+
+    for (let i = 1; i < allData.length; i++) {
+      const row = allData[i];
+      const nom = String(row[colNom] || '').trim().toUpperCase();
+      const prenom = String(row[colPrenom] || '').trim().toUpperCase();
+
+      if (nom === nomRecherche && prenom === prenomRecherche) {
+        const result = {
+          status: 'found',
+          numeroLicence: colLicence !== -1 ? String(row[colLicence] || '') : '',
+          email: colEmail !== -1 ? String(row[colEmail] || '') : '',
+          telephone: colTel !== -1 ? String(row[colTel] || '') : '',
+          adresse: colAdresse !== -1 ? String(row[colAdresse] || '') : '',
+          nationalite: colNationalite !== -1 ? String(row[colNationalite] || '') : '',
+          saison: sheetName
+        };
+        return jsonResponse(result);
+      }
+    }
+  }
+
+  return jsonResponse({ status: 'not_found' });
 }
 
 // ─── Helpers : Sheets ───────────────────────────────────────────
