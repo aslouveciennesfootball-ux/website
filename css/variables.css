@@ -1,0 +1,75 @@
+:root {
+  /* Couleurs du blason ASL */
+  --bleu: #1E3A8A;
+  --bleu-clair: #2563EB;
+  --bleu-fonce: #1E2D5B;
+  --rouge: #C41E3A;
+  --rouge-clair: #DC2626;
+  --or: #D4A843;
+  --or-clair: #E5C36B;
+
+  /* Neutres */
+  --blanc: #FFFFFF;
+  --gris-50: #F9FAFB;
+  --gris-100: #F3F4F6;
+  --gris-200: #E5E7EB;
+  --gris-300: #D1D5DB;
+  --gris-400: #9CA3AF;
+  --gris-500: #6B7280;
+  --gris-600: #4B5563;
+  --gris-700: #374151;
+  --gris-800: #1F2937;
+  --gris-900: #111827;
+  --noir: #0A0A0A;
+
+  /* Sémantique */
+  --succes: #16A34A;
+  --erreur: #DC2626;
+  --info: #2563EB;
+
+  /* Typographie */
+  --font-titre: 'Montserrat', sans-serif;
+  --font-corps: 'Open Sans', sans-serif;
+  --fs-xs: 0.75rem;
+  --fs-sm: 0.875rem;
+  --fs-base: 1rem;
+  --fs-lg: 1.125rem;
+  --fs-xl: 1.25rem;
+  --fs-2xl: 1.5rem;
+  --fs-3xl: 1.875rem;
+  --fs-4xl: 2.25rem;
+  --fs-5xl: 3rem;
+
+  /* Espacements */
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.75rem;
+  --sp-4: 1rem;
+  --sp-5: 1.25rem;
+  --sp-6: 1.5rem;
+  --sp-8: 2rem;
+  --sp-10: 2.5rem;
+  --sp-12: 3rem;
+  --sp-16: 4rem;
+  --sp-20: 5rem;
+
+  /* Bordures & ombres */
+  --radius-sm: 0.25rem;
+  --radius: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-full: 9999px;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.06);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05);
+  --shadow-xl: 0 20px 25px rgba(0,0,0,0.1), 0 10px 10px rgba(0,0,0,0.04);
+
+  /* Transitions */
+  --transition: 150ms ease;
+  --transition-slow: 300ms ease;
+
+  /* Layout */
+  --container-max: 1200px;
+  --navbar-h: 4rem;
+}

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact — AS Louveciennes Football</title>
+  <meta name="description" content="Contactez l'AS Louveciennes Football. Adresse du stade, téléphone et formulaire de contact.">
+  <link rel="icon" href="assets/img/favicon.ico">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <nav class="navbar" role="navigation" aria-label="Navigation principale">
+    <div class="container navbar__inner">
+      <a href="index.html" class="navbar__logo">
+        <img src="assets/img/logo.png" alt="Logo ASL" width="40" height="40">
+        <span>AS Louveciennes</span>
+      </a>
+      <div class="navbar__links">
+        <a href="index.html">Accueil</a>
+        <a href="club.html">Le Club</a>
+        <a href="equipes.html">Équipes</a>
+        <a href="actualites.html">Actualités</a>
+        <a href="galerie.html">Galerie</a>
+        <a href="contact.html">Contact</a>
+      </div>
+      <a href="inscription.html" class="btn btn--primary btn--sm navbar__cta">Inscription</a>
+      <button class="navbar__burger" aria-label="Menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="navbar__mobile" role="menu">
+      <a href="index.html" role="menuitem">Accueil</a>
+      <a href="club.html" role="menuitem">Le Club</a>
+      <a href="equipes.html" role="menuitem">Équipes</a>
+      <a href="actualites.html" role="menuitem">Actualités</a>
+      <a href="galerie.html" role="menuitem">Galerie</a>
+      <a href="contact.html" role="menuitem">Contact</a>
+      <a href="inscription.html" class="btn btn--primary" role="menuitem">Inscription saison</a>
+      <a href="stages.html" class="btn btn--secondary" role="menuitem">Stages</a>
+    </div>
+  </nav>
+
+  <div class="page-header">
+    <div class="container">
+      <h1 class="page-header__title">Contact</h1>
+      <p class="page-header__subtitle">Une question ? N'hésitez pas à nous contacter.</p>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="container">
+      <div class="contact-grid">
+
+        <!-- Infos -->
+        <div>
+          <h2 style="font-size:var(--fs-2xl);margin-bottom:var(--sp-6);">Nos coordonnées</h2>
+
+          <div style="display:flex;flex-direction:column;gap:var(--sp-4);">
+            <div class="contact-info-card">
+              <div class="contact-info-card__icon">📍</div>
+              <div>
+                <div class="contact-info-card__title">Adresse</div>
+                <div class="contact-info-card__text">Stade Municipal<br>Rue de la Princesse<br>78430 Louveciennes</div>
+              </div>
+            </div>
+            <div class="contact-info-card">
+              <div class="contact-info-card__icon">📧</div>
+              <div>
+                <div class="contact-info-card__title">Email</div>
+                <div class="contact-info-card__text">contact@aslouveciennes.fr</div>
+              </div>
+            </div>
+            <div class="contact-info-card">
+              <div class="contact-info-card__icon">📞</div>
+              <div>
+                <div class="contact-info-card__title">Téléphone</div>
+                <div class="contact-info-card__text">01 39 69 XX XX</div>
+              </div>
+            </div>
+            <div class="contact-info-card">
+              <div class="contact-info-card__icon">🕐</div>
+              <div>
+                <div class="contact-info-card__title">Horaires du secrétariat</div>
+                <div class="contact-info-card__text">Mercredi 14h-18h<br>Samedi 9h-12h</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Formulaire -->
+        <div>
+          <h2 style="font-size:var(--fs-2xl);margin-bottom:var(--sp-6);">Envoyez-nous un message</h2>
+
+          <form id="contactForm" novalidate>
+            <div class="form-row form-row--2">
+              <div class="form-group">
+                <label for="contactNom">Nom <span class="required">*</span></label>
+                <input type="text" id="contactNom" class="form-input" required>
+                <div class="form-error"></div>
+              </div>
+              <div class="form-group">
+                <label for="contactPrenom">Prénom <span class="required">*</span></label>
+                <input type="text" id="contactPrenom" class="form-input" required>
+                <div class="form-error"></div>
+              </div>
+            </div>
+            <div class="form-row form-row--2">
+              <div class="form-group">
+                <label for="contactEmail">Email <span class="required">*</span></label>
+                <input type="email" id="contactEmail" class="form-input" required>
+                <div class="form-error"></div>
+              </div>
+              <div class="form-group">
+                <label for="contactTel">Téléphone</label>
+                <input type="tel" id="contactTel" class="form-input">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="contactSujet">Sujet <span class="required">*</span></label>
+              <select id="contactSujet" class="form-select" required>
+                <option value="">Sélectionner un sujet</option>
+                <option value="Inscription">Inscription / Réinscription</option>
+                <option value="Stage">Stages vacances</option>
+                <option value="Renseignements">Renseignements généraux</option>
+                <option value="Partenariat">Partenariat / Sponsoring</option>
+                <option value="Autre">Autre</option>
+              </select>
+              <div class="form-error"></div>
+            </div>
+            <div class="form-group">
+              <label for="contactMessage">Message <span class="required">*</span></label>
+              <textarea id="contactMessage" class="form-textarea" rows="5" required></textarea>
+              <div class="form-error"></div>
+            </div>
+            <button type="submit" class="btn btn--primary btn--lg btn-submit">Envoyer le message</button>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Map -->
+  <section style="height:350px;background:var(--gris-200);display:flex;align-items:center;justify-content:center;">
+    <div style="text-align:center;color:var(--gris-500);">
+      <div style="font-size:3rem;margin-bottom:var(--sp-4);">🗺️</div>
+      <p>Stade Municipal de Louveciennes — Rue de la Princesse, 78430</p>
+      <p style="font-size:var(--fs-sm);margin-top:var(--sp-2);">Google Maps intégrable ici</p>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__grid">
+        <div>
+          <div class="footer__title">AS Louveciennes Football</div>
+          <div class="footer__info">
+            <p>Fondé en 1911</p>
+            <p>« Une Passion Partagée »</p>
+            <p>Stade Municipal, Rue de la Princesse</p>
+            <p>78430 Louveciennes</p>
+          </div>
+        </div>
+        <div>
+          <div class="footer__title">Navigation</div>
+          <div class="footer__links">
+            <a href="index.html">Accueil</a>
+            <a href="club.html">Le Club</a>
+            <a href="equipes.html">Équipes</a>
+            <a href="actualites.html">Actualités</a>
+          </div>
+        </div>
+        <div>
+          <div class="footer__title">S'inscrire</div>
+          <div class="footer__links">
+            <a href="inscription.html">Inscription saison</a>
+            <a href="stages.html">Stages</a>
+            <a href="contact.html">Contact</a>
+            <a href="galerie.html">Galerie</a>
+          </div>
+        </div>
+        <div>
+          <div class="footer__title">Contact</div>
+          <div class="footer__info">
+            <p>contact@aslouveciennes.fr</p>
+            <p>01 39 69 XX XX</p>
+          </div>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <p>&copy; 2026 AS Louveciennes Football. Tous droits réservés.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/contact.js"></script>
+</body>
+</html>

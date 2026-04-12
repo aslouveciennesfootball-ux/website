@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inscription Saison 2025-2026 — AS Louveciennes Football</title>
+  <meta name="description" content="Inscrivez votre enfant à l'AS Louveciennes Football pour la saison 2025-2026. Formulaire en ligne rapide et sécurisé.">
+  <link rel="icon" href="assets/img/favicon.ico">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .form-step { display: none; }
+    .form-step.active { display: block; }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar" role="navigation" aria-label="Navigation principale">
+    <div class="container navbar__inner">
+      <a href="index.html" class="navbar__logo">
+        <img src="assets/img/logo.png" alt="Logo ASL" width="40" height="40">
+        <span>AS Louveciennes</span>
+      </a>
+      <div class="navbar__links">
+        <a href="index.html">Accueil</a>
+        <a href="club.html">Le Club</a>
+        <a href="equipes.html">Équipes</a>
+        <a href="actualites.html">Actualités</a>
+        <a href="galerie.html">Galerie</a>
+        <a href="contact.html">Contact</a>
+      </div>
+      <a href="inscription.html" class="btn btn--primary btn--sm navbar__cta">Inscription</a>
+      <button class="navbar__burger" aria-label="Menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="navbar__mobile" role="menu">
+      <a href="index.html" role="menuitem">Accueil</a>
+      <a href="club.html" role="menuitem">Le Club</a>
+      <a href="equipes.html" role="menuitem">Équipes</a>
+      <a href="actualites.html" role="menuitem">Actualités</a>
+      <a href="galerie.html" role="menuitem">Galerie</a>
+      <a href="contact.html" role="menuitem">Contact</a>
+      <a href="inscription.html" class="btn btn--primary" role="menuitem">Inscription saison</a>
+      <a href="stages.html" class="btn btn--secondary" role="menuitem">Stages</a>
+    </div>
+  </nav>
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <div class="container">
+      <h1 class="page-header__title">Inscription Saison 2025-2026</h1>
+      <p class="page-header__subtitle">Remplissez le formulaire ci-dessous pour inscrire votre enfant.</p>
+    </div>
+  </div>
+
+  <!-- FORMULAIRE -->
+  <section class="section inscription-form">
+    <div class="container" style="max-width:700px;">
+
+      <!-- Stepper -->
+      <div class="stepper">
+        <div class="stepper__step active">
+          <div class="stepper__number">1</div>
+          <span class="stepper__label">Joueur</span>
+        </div>
+        <div class="stepper__line"></div>
+        <div class="stepper__step">
+          <div class="stepper__number">2</div>
+          <span class="stepper__label">Coordonnées</span>
+        </div>
+        <div class="stepper__line"></div>
+        <div class="stepper__step">
+          <div class="stepper__number">3</div>
+          <span class="stepper__label">Documents</span>
+        </div>
+      </div>
+
+      <form id="inscriptionForm" novalidate>
+
+        <!-- ÉTAPE 1 : Joueur -->
+        <div class="form-step active" data-step="1">
+          <h2 style="font-size:var(--fs-2xl);margin-bottom:var(--sp-6);">Informations du joueur</h2>
+
+          <div class="form-row form-row--2">
+            <div class="form-group">
+              <label for="nom">Nom <span class="required">*</span></label>
+              <input type="text" id="nom" class="form-input" required autocomplete="family-name">
+              <div class="form-error"></div>
+            </div>
+            <div class="form-group">
+              <label for="prenom">Prénom <span class="required">*</span></label>
+              <input type="text" id="prenom" class="form-input" required autocomplete="given-name">
+              <div class="form-error"></div>
+            </div>
+          </div>
+
+          <div class="form-row form-row--2">
+            <div class="form-group">
+              <label for="dateNaissance">Date de naissance <span class="required">*</span></label>
+              <input type="date" id="dateNaissance" class="form-input" required>
+              <div class="form-error"></div>
+            </div>
+            <div class="form-group">
+              <label for="sexe">Sexe <span class="required">*</span></label>
+              <select id="sexe" class="form-select" required>
+                <option value="">Sélectionner</option>
+                <option value="M">Masculin</option>
+                <option value="F">Féminin</option>
+              </select>
+              <div class="form-error"></div>
+            </div>
+          </div>
+
+          <!-- Catégorie auto-calculée -->
+          <div class="categorie-result" style="display:none;">
+            <div class="categorie-result__label">Catégorie calculée automatiquement</div>
+            <div class="categorie-result__value" id="categorieDisplay">—</div>
+          </div>
+          <input type="hidden" id="categorie" name="categorie">
+
+          <div style="display:flex;justify-content:flex-end;margin-top:var(--sp-8);">
+            <button type="button" class="btn btn--primary step-next">Suivant &rarr;</button>
+          </div>
+        </div>
+
+        <!-- ÉTAPE 2 : Coordonnées -->
+        <div class="form-step" data-step="2">
+          <h2 style="font-size:var(--fs-2xl);margin-bottom:var(--sp-6);">Coordonnées</h2>
+
+          <div class="form-row form-row--2">
+            <div class="form-group">
+              <label for="email">Email <span class="required">*</span></label>
+              <input type="email" id="email" class="form-input" required autocomplete="email">
+              <div class="form-error"></div>
+            </div>
+            <div class="form-group">
+              <label for="telephone">Téléphone <span class="required">*</span></label>
+              <input type="tel" id="telephone" class="form-input" required autocomplete="tel" placeholder="06 12 34 56 78">
+              <div class="form-error"></div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="adresse">Adresse <span class="required">*</span></label>
+            <input type="text" id="adresse" class="form-input" required autocomplete="street-address">
+            <div class="form-error"></div>
+          </div>
+
+          <div class="form-row form-row--2">
+            <div class="form-group">
+              <label for="codePostal">Code postal <span class="required">*</span></label>
+              <input type="text" id="codePostal" class="form-input" required autocomplete="postal-code" maxlength="5">
+              <div class="form-error"></div>
+            </div>
+            <div class="form-group">
+              <label for="ville">Ville <span class="required">*</span></label>
+              <input type="text" id="ville" class="form-input" required autocomplete="address-level2">
+              <div class="form-error"></div>
+            </div>
+          </div>
+
+          <h3 style="font-size:var(--fs-lg);margin:var(--sp-8) 0 var(--sp-4);color:var(--rouge);">Contact d'urgence</h3>
+
+          <div class="form-row form-row--2">
+            <div class="form-group">
+              <label for="contactUrgenceNom">Nom & lien <span class="required">*</span></label>
+              <input type="text" id="contactUrgenceNom" class="form-input" required placeholder="ex : Marie Dupont (mère)">
+              <div class="form-error"></div>
+            </div>
+            <div class="form-group">
+              <label for="contactUrgenceTel">Téléphone <span class="required">*</span></label>
+              <input type="tel" id="contactUrgenceTel" class="form-input" required placeholder="06 12 34 56 78">
+              <div class="form-error"></div>
+            </div>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;margin-top:var(--sp-8);">
+            <button type="button" class="btn btn--outline step-prev">&larr; Précédent</button>
+            <button type="button" class="btn btn--primary step-next">Suivant &rarr;</button>
+          </div>
+        </div>
+
+        <!-- ÉTAPE 3 : Documents -->
+        <div class="form-step" data-step="3">
+          <h2 style="font-size:var(--fs-2xl);margin-bottom:var(--sp-6);">Documents</h2>
+
+          <div class="form-group">
+            <label>Certificat médical <span class="required">*</span></label>
+            <div class="file-upload">
+              <input type="file" id="certificat" accept=".pdf,.jpg,.jpeg,.png" required>
+              <div class="file-upload__icon">📄</div>
+              <div class="file-upload__text">Cliquez ou glissez votre certificat médical ici<br><small>PDF, JPG ou PNG — 5 Mo max</small></div>
+              <div class="file-upload__name"></div>
+            </div>
+            <div class="form-error"></div>
+          </div>
+
+          <div class="form-group">
+            <label>Photo d'identité</label>
+            <div class="file-upload">
+              <input type="file" id="photo" accept=".jpg,.jpeg,.png">
+              <div class="file-upload__icon">📷</div>
+              <div class="file-upload__text">Cliquez ou glissez une photo d'identité<br><small>JPG ou PNG — 5 Mo max</small></div>
+              <div class="file-upload__name"></div>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top:var(--sp-6);">
+            <label style="display:flex;align-items:flex-start;gap:var(--sp-3);cursor:pointer;">
+              <input type="checkbox" id="autorisationParentale" style="margin-top:4px;width:18px;height:18px;flex-shrink:0;" required>
+              <span>J'autorise mon enfant à participer aux activités de l'AS Louveciennes Football et certifie l'exactitude des informations fournies. <span class="required">*</span></span>
+            </label>
+            <div class="form-error"></div>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;margin-top:var(--sp-8);">
+            <button type="button" class="btn btn--outline step-prev">&larr; Précédent</button>
+            <button type="submit" class="btn btn--secondary btn--lg btn-submit">Envoyer l'inscription</button>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__grid">
+        <div>
+          <div class="footer__title">AS Louveciennes Football</div>
+          <div class="footer__info">
+            <p>Fondé en 1911</p>
+            <p>« Une Passion Partagée »</p>
+            <p>Stade Municipal, Rue de la Princesse</p>
+            <p>78430 Louveciennes</p>
+          </div>
+        </div>
+        <div>
+          <div class="footer__title">Navigation</div>
+          <div class="footer__links">
+            <a href="index.html">Accueil</a>
+            <a href="club.html">Le Club</a>
+            <a href="equipes.html">Équipes</a>
+            <a href="actualites.html">Actualités</a>
+          </div>
+        </div>
+        <div>
+          <div class="footer__title">S'inscrire</div>
+          <div class="footer__links">
+            <a href="inscription.html">Inscription saison</a>
+            <a href="stages.html">Stages</a>
+            <a href="contact.html">Contact</a>
+            <a href="galerie.html">Galerie</a>
+          </div>
+        </div>
+        <div>
+          <div class="footer__title">Contact</div>
+          <div class="footer__info">
+            <p>contact@aslouveciennes.fr</p>
+            <p>01 39 69 XX XX</p>
+          </div>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <p>&copy; 2026 AS Louveciennes Football. Tous droits réservés.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/inscription.js"></script>
+</body>
+</html>

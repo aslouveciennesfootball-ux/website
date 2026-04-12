@@ -1,0 +1,282 @@
+/* ============================================
+   PAGE CLUB
+   ============================================ */
+.club-history {
+  display: grid;
+  gap: var(--sp-8);
+  align-items: center;
+}
+
+.club-history__text p {
+  margin-bottom: var(--sp-4);
+  line-height: 1.8;
+}
+
+.club-values {
+  display: grid;
+  gap: var(--sp-6);
+}
+
+.value-card {
+  text-align: center;
+  padding: var(--sp-8) var(--sp-6);
+  border-radius: var(--radius-lg);
+  background: var(--blanc);
+  box-shadow: var(--shadow);
+}
+
+.value-card__icon {
+  font-size: 2.5rem;
+  margin-bottom: var(--sp-4);
+}
+
+.value-card__title {
+  font-size: var(--fs-xl);
+  margin-bottom: var(--sp-2);
+  color: var(--bleu);
+}
+
+.value-card__text {
+  color: var(--gris-600);
+  font-size: var(--fs-sm);
+}
+
+@media (min-width: 640px) {
+  .club-history { grid-template-columns: 1fr 1fr; }
+  .club-values { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 1024px) {
+  .club-values { grid-template-columns: repeat(4, 1fr); }
+}
+
+/* ============================================
+   PAGE EQUIPES
+   ============================================ */
+.equipe-card {
+  background: var(--blanc);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: var(--sp-6);
+  border-left: 4px solid var(--bleu);
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.equipe-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.equipe-card__categorie {
+  font-family: var(--font-titre);
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  color: var(--bleu);
+  margin-bottom: var(--sp-1);
+}
+
+.equipe-card__age {
+  font-size: var(--fs-sm);
+  color: var(--gris-500);
+  margin-bottom: var(--sp-3);
+}
+
+.equipe-card__info {
+  font-size: var(--fs-sm);
+  color: var(--gris-600);
+  line-height: 1.6;
+}
+
+/* ============================================
+   PAGE ACTUALITES
+   ============================================ */
+.actu-card {
+  background: var(--blanc);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.actu-card__img {
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+  background: var(--gris-200);
+}
+
+.actu-card__body {
+  padding: var(--sp-5);
+}
+
+.actu-card__date {
+  font-size: var(--fs-xs);
+  color: var(--gris-500);
+  margin-bottom: var(--sp-2);
+}
+
+.actu-card__title {
+  font-size: var(--fs-lg);
+  margin-bottom: var(--sp-3);
+}
+
+.actu-card__excerpt {
+  font-size: var(--fs-sm);
+  color: var(--gris-600);
+  line-height: 1.6;
+}
+
+/* ============================================
+   PAGE CONTACT
+   ============================================ */
+.contact-grid {
+  display: grid;
+  gap: var(--sp-8);
+}
+
+.contact-info-card {
+  display: flex;
+  gap: var(--sp-4);
+  padding: var(--sp-5);
+  background: var(--blanc);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+}
+
+.contact-info-card__icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  width: 3rem;
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(30, 58, 138, 0.1);
+  border-radius: var(--radius);
+  color: var(--bleu);
+}
+
+.contact-info-card__title {
+  font-weight: 700;
+  font-size: var(--fs-base);
+  margin-bottom: var(--sp-1);
+}
+
+.contact-info-card__text {
+  font-size: var(--fs-sm);
+  color: var(--gris-600);
+  line-height: 1.6;
+}
+
+@media (min-width: 1024px) {
+  .contact-grid { grid-template-columns: 1fr 1fr; }
+}
+
+/* ============================================
+   PAGE GALERIE
+   ============================================ */
+.galerie-grid {
+  display: grid;
+  gap: var(--sp-4);
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.galerie-item {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  cursor: pointer;
+  position: relative;
+}
+
+.galerie-item img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  transition: transform var(--transition-slow);
+}
+
+.galerie-item:hover img {
+  transform: scale(1.05);
+}
+
+.galerie-item__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(transparent 50%, rgba(0,0,0,0.5));
+  opacity: 0;
+  transition: opacity var(--transition-slow);
+  display: flex;
+  align-items: flex-end;
+  padding: var(--sp-4);
+}
+
+.galerie-item:hover .galerie-item__overlay {
+  opacity: 1;
+}
+
+.galerie-item__caption {
+  color: var(--blanc);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+
+@media (min-width: 640px) {
+  .galerie-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (min-width: 1024px) {
+  .galerie-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+/* ============================================
+   INSCRIPTION - CATÉGORIE AUTO
+   ============================================ */
+.categorie-result {
+  padding: var(--sp-4) var(--sp-5);
+  background: rgba(30, 58, 138, 0.05);
+  border: 2px solid var(--bleu);
+  border-radius: var(--radius-lg);
+  text-align: center;
+}
+
+.categorie-result__label {
+  font-size: var(--fs-sm);
+  color: var(--gris-600);
+  margin-bottom: var(--sp-1);
+}
+
+.categorie-result__value {
+  font-family: var(--font-titre);
+  font-size: var(--fs-2xl);
+  font-weight: 800;
+  color: var(--bleu);
+}
+
+/* ============================================
+   INSCRIPTION STAGES
+   ============================================ */
+.stage-card {
+  background: var(--blanc);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: var(--sp-6);
+  border-top: 4px solid var(--or);
+}
+
+.stage-card__title {
+  font-size: var(--fs-xl);
+  margin-bottom: var(--sp-2);
+  color: var(--bleu);
+}
+
+.stage-card__dates {
+  font-size: var(--fs-sm);
+  color: var(--gris-500);
+  margin-bottom: var(--sp-3);
+}
+
+.stage-card__prix {
+  font-family: var(--font-titre);
+  font-size: var(--fs-2xl);
+  font-weight: 800;
+  color: var(--or);
+}
