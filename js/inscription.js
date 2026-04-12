@@ -191,26 +191,13 @@ function initCodePostalAutocomplete() {
 
   let debounceTimer;
   let lastCpSearched = '';
-  var debugEl = document.getElementById('cpDebug');
-
-  function debugMsg(msg) {
-    console.log('[ASL] ' + msg);
-    if (debugEl) debugEl.textContent = msg;
-  }
-
   function rechercherCP(cp) {
     if (cp === lastCpSearched) return;
     lastCpSearched = cp;
-    debugMsg('Recherche ' + cp + '...');
 
-    var url = 'https://geo.api.gouv.fr/communes?codePostal=' + cp + '&fields=nom,codesPostaux&limit=10';
-    fetch(url)
-      .then(function(res) {
-        debugMsg('API répondu, status ' + res.status);
-        return res.json();
-      })
+    fetch('https://geo.api.gouv.fr/communes?codePostal=' + cp + '&fields=nom,codesPostaux&limit=10')
+      .then(function(res) { return res.json(); })
       .then(function(communes) {
-        debugMsg(communes.length + ' commune(s) trouvée(s)');
 
         if (communes.length === 0) { cpList.style.display = 'none'; return; }
 
@@ -218,8 +205,7 @@ function initCodePostalAutocomplete() {
           villeInput.value = communes[0].nom;
           cpList.style.display = 'none';
           villeInput.style.backgroundColor = '#d4edda';
-          setTimeout(function() { villeInput.style.backgroundColor = ''; }, 2000);
-          debugMsg('Ville: ' + communes[0].nom);
+          setTimeout(function() { villeInput.style.backgroundColor = ''; }, 1500);
           return;
         }
 
@@ -235,17 +221,12 @@ function initCodePostalAutocomplete() {
           });
         });
       })
-      .catch(function(err) {
-        debugMsg('ERREUR: ' + err.message);
-        cpList.style.display = 'none';
-      });
+      .catch(function() { cpList.style.display = 'none'; });
   }
 
   function onCpChange() {
     clearTimeout(debounceTimer);
-    var raw = cpInput.value;
-    var cp = raw.trim().replace(/\D/g, '');
-    debugMsg('Saisie: "' + raw + '" → digits: ' + cp.length);
+    var cp = cpInput.value.trim().replace(/\D/g, '');
     if (cp.length < 5) { cpList.style.display = 'none'; return; }
 
     debounceTimer = setTimeout(function() { rechercherCP(cp); }, 200);
@@ -293,7 +274,6 @@ function initCodePostalAutocomplete() {
     if (!e.target.closest('#ville') && !e.target.closest('#villeSuggestions')) villeList.style.display = 'none';
   });
 
-  console.log('[ASL] CP autocomplete initialisé');
 }
 
 // ─── Recherche adhérent existant ─────────────────────────────────
