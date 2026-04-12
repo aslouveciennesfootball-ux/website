@@ -252,8 +252,8 @@ Bonjour,
 Nous confirmons l'inscription de ${data.prenom} ${data.nom} au stage "${data.stage}" (${data.dates}).
 
 Informations pratiques :
-- Accueil à partir de 9h au stade municipal
-- Prévoir : chaussures de foot, protège-tibias, gourde, goûter
+- Horaires : 9h à 17h au Stade du Cœur Volant
+- Prévoir : chaussures de foot, protège-tibias, gourde, picnic (pizza offerte le vendredi)
 - Contact urgence : ${data.contactUrgenceNom} (${data.contactUrgenceTel})
 
 À bientôt sur les terrains !
