@@ -18,7 +18,7 @@ const CONFIG = {
   ONGLET_STAGES: 'Inscriptions_Stages_Web',
   DRIVE_FOLDER_NAME: 'ASL_Inscriptions_Documents',
   EMAIL_CLUB: 'contact@aslouveciennes.fr',
-  SAISON: '2025-2026'
+  SAISON: '2026-2027'
 };
 
 // ─── Point d'entrée GET (test) ───────────────────────────────────

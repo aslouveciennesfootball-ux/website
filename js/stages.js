@@ -26,7 +26,7 @@ function initDateNaissanceStage() {
 function calculateCategorieStage(dateStr) {
   if (!dateStr) return null;
   const birthYear = new Date(dateStr).getFullYear();
-  const age = 2026 - birthYear;
+  const age = 2027 - birthYear;
   if (age < 5) return null;
   if (age <= 6) return 'U7';
   if (age <= 7) return 'U8';

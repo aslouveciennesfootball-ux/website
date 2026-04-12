@@ -91,8 +91,8 @@ function calculateCategorie(dateStr) {
   const birthDate = new Date(dateStr);
   const now = new Date();
 
-  // Saison = année civile de fin de saison (ex: saison 2025-2026, on regarde l'âge au 1er janvier 2026)
-  const saisonYear = 2026;
+  // Saison = année civile de fin de saison (ex: saison 2026-2027, on regarde l'âge au 1er janvier 2027)
+  const saisonYear = 2027;
   const age = saisonYear - birthDate.getFullYear();
 
   if (age < 5) return null;
