@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initFileUploads();
   initOptionToggles();
   initAdherentLookup();
+  initCodePostalAutocomplete();
   initFormSubmit();
 });
 
@@ -117,6 +118,90 @@ function initOptionToggles() {
     cb.addEventListener('change', () => {
       el.style.display = cb.checked ? 'block' : 'none';
     });
+  });
+}
+
+// ─── Autocomplétion Code Postal / Ville (geo.api.gouv.fr) ───────
+
+function initCodePostalAutocomplete() {
+  const cpInput = document.getElementById('codePostal');
+  const villeInput = document.getElementById('ville');
+  const cpList = document.getElementById('cpSuggestions');
+  const villeList = document.getElementById('villeSuggestions');
+
+  if (!cpInput || !villeInput) return;
+
+  let debounceTimer;
+
+  // Saisie code postal → suggestions de villes
+  cpInput.addEventListener('input', () => {
+    clearTimeout(debounceTimer);
+    const cp = cpInput.value.trim();
+    if (cp.length < 3) { cpList.style.display = 'none'; return; }
+
+    debounceTimer = setTimeout(async () => {
+      try {
+        const res = await fetch(`https://geo.api.gouv.fr/communes?codePostal=${cp}&fields=nom,codesPostaux&limit=10`);
+        const communes = await res.json();
+
+        if (communes.length === 0) { cpList.style.display = 'none'; return; }
+
+        // Si un seul résultat, remplir directement
+        if (communes.length === 1) {
+          villeInput.value = communes[0].nom;
+          cpList.style.display = 'none';
+          return;
+        }
+
+        cpList.innerHTML = communes.map(c =>
+          `<div class="autocomplete-item" data-ville="${c.nom}" data-cp="${c.codesPostaux[0]}">${c.codesPostaux[0]} — ${c.nom}</div>`
+        ).join('');
+        cpList.style.display = 'block';
+
+        cpList.querySelectorAll('.autocomplete-item').forEach(item => {
+          item.addEventListener('click', () => {
+            cpInput.value = item.dataset.cp;
+            villeInput.value = item.dataset.ville;
+            cpList.style.display = 'none';
+          });
+        });
+      } catch (e) { cpList.style.display = 'none'; }
+    }, 300);
+  });
+
+  // Saisie ville → suggestions avec code postal
+  villeInput.addEventListener('input', () => {
+    clearTimeout(debounceTimer);
+    const ville = villeInput.value.trim();
+    if (ville.length < 2) { villeList.style.display = 'none'; return; }
+
+    debounceTimer = setTimeout(async () => {
+      try {
+        const res = await fetch(`https://geo.api.gouv.fr/communes?nom=${encodeURIComponent(ville)}&fields=nom,codesPostaux&limit=8`);
+        const communes = await res.json();
+
+        if (communes.length === 0) { villeList.style.display = 'none'; return; }
+
+        villeList.innerHTML = communes.map(c =>
+          `<div class="autocomplete-item" data-ville="${c.nom}" data-cp="${c.codesPostaux[0]}">${c.nom} — ${c.codesPostaux[0]}</div>`
+        ).join('');
+        villeList.style.display = 'block';
+
+        villeList.querySelectorAll('.autocomplete-item').forEach(item => {
+          item.addEventListener('click', () => {
+            villeInput.value = item.dataset.ville;
+            cpInput.value = item.dataset.cp;
+            villeList.style.display = 'none';
+          });
+        });
+      } catch (e) { villeList.style.display = 'none'; }
+    }, 300);
+  });
+
+  // Fermer les suggestions quand on clique ailleurs
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('#codePostal') && !e.target.closest('#cpSuggestions')) cpList.style.display = 'none';
+    if (!e.target.closest('#ville') && !e.target.closest('#villeSuggestions')) villeList.style.display = 'none';
   });
 }
 
@@ -345,6 +430,8 @@ function initFormSubmit() {
         numeroLicence: document.getElementById('numeroLicence').value.trim(),
         // Responsable
         adresse: document.getElementById('adresse').value.trim(),
+        codePostal: document.getElementById('codePostal').value.trim(),
+        ville: document.getElementById('ville').value.trim(),
         email: document.getElementById('email').value.trim(),
         telephone: document.getElementById('telephone').value.trim(),
         whatsapp1: document.getElementById('whatsapp1').checked,
