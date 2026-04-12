@@ -17,7 +17,7 @@ const CONFIG = {
   ONGLET_INSCRIPTIONS: 'Inscriptions_Web',
   ONGLET_STAGES: 'Inscriptions_Stages_Web',
   DRIVE_FOLDER_NAME: 'ASL_Inscriptions_Documents',
-  EMAIL_CLUB: 'contact@aslouveciennes.fr',
+  EMAIL_CLUB: 'aslouveciennesfootball@gmail.com',
   SAISON: '2026-2027'
 };
 
