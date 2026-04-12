@@ -220,56 +220,97 @@ Message envoyé depuis le formulaire de contact du site aslouveciennes.fr
 // ─── Recherche Adhérent (pré-remplissage) ───────────────────────
 
 function handleRechercheAdherent(data) {
-  const ss = SpreadsheetApp.openById(CONFIG.SHEET_ADHERENTS);
-  // Chercher dans tous les onglets contenant des adhérents
-  const sheetNames = ss.getSheets().map(s => s.getName());
+  try {
+    const ss = SpreadsheetApp.openById(CONFIG.SHEET_ADHERENTS);
+    const sheetNames = ss.getSheets().map(s => s.getName());
 
-  const nomRecherche = (data.nom || '').trim().toUpperCase();
-  const prenomRecherche = (data.prenom || '').trim().toUpperCase();
+    const nomRecherche = (data.nom || '').trim().toUpperCase();
+    const prenomRecherche = (data.prenom || '').trim().toUpperCase();
 
-  if (!nomRecherche || !prenomRecherche) {
-    return jsonResponse({ status: 'not_found' });
-  }
+    if (!nomRecherche || !prenomRecherche) {
+      return jsonResponse({ status: 'not_found' });
+    }
 
-  for (const sheetName of sheetNames) {
-    const sheet = ss.getSheetByName(sheetName);
-    if (sheet.getLastRow() < 2) continue;
+    for (const sheetName of sheetNames) {
+      const sheet = ss.getSheetByName(sheetName);
+      if (sheet.getLastRow() < 2) continue;
 
-    const allData = sheet.getDataRange().getValues();
-    const headers = allData[0].map(h => String(h).toLowerCase().trim());
+      const allData = sheet.getDataRange().getValues();
+      const headers = allData[0].map(h => String(h).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim());
 
-    // Trouver les indices des colonnes
-    const colNom = headers.findIndex(h => h.includes('nom') && !h.includes('prenom') && !h.includes('prénom') && !h.includes('urgence') && !h.includes('lieu'));
-    const colPrenom = headers.findIndex(h => h.includes('prenom') || h.includes('prénom'));
-    const colLicence = headers.findIndex(h => h.includes('licence') || h.includes('licen'));
-    const colEmail = headers.findIndex(h => h.includes('mail') && !h.includes('2'));
-    const colTel = headers.findIndex(h => h.includes('telephone') || h.includes('tel'));
-    const colAdresse = headers.findIndex(h => h.includes('adresse'));
-    const colNationalite = headers.findIndex(h => h.includes('nationalit'));
+      // Recherche robuste des colonnes (gère typos et accents)
+      const colNom = findCol(headers, ['nom de l', 'nom'], ['prenom', 'urgence', 'lieu']);
+      const colPrenom = findCol(headers, ['prenom', 'prénom']);
+      const colLicence = findCol(headers, ['licence', 'liccen', 'licen', 'lic']);
+      const colEmail = findCol(headers, ['mail', 'email'], ['2nd', '2eme', '2e ']);
+      const colTel = findCol(headers, ['telephone de contact', 'telephone', 'tel de contact']);
+      const colAdresse = findCol(headers, ['adresse']);
+      const colNationalite = findCol(headers, ['nationalit']);
 
-    if (colNom === -1 || colPrenom === -1) continue;
+      if (colNom === -1 || colPrenom === -1) continue;
 
-    for (let i = 1; i < allData.length; i++) {
-      const row = allData[i];
-      const nom = String(row[colNom] || '').trim().toUpperCase();
-      const prenom = String(row[colPrenom] || '').trim().toUpperCase();
+      for (let i = 1; i < allData.length; i++) {
+        const row = allData[i];
+        const nom = String(row[colNom] || '').trim().toUpperCase();
+        const prenom = String(row[colPrenom] || '').trim().toUpperCase();
 
-      if (nom === nomRecherche && prenom === prenomRecherche) {
-        const result = {
-          status: 'found',
-          numeroLicence: colLicence !== -1 ? String(row[colLicence] || '') : '',
-          email: colEmail !== -1 ? String(row[colEmail] || '') : '',
-          telephone: colTel !== -1 ? String(row[colTel] || '') : '',
-          adresse: colAdresse !== -1 ? String(row[colAdresse] || '') : '',
-          nationalite: colNationalite !== -1 ? String(row[colNationalite] || '') : '',
-          saison: sheetName
-        };
-        return jsonResponse(result);
+        if (nom === nomRecherche && prenom === prenomRecherche) {
+          return jsonResponse({
+            status: 'found',
+            numeroLicence: colLicence !== -1 ? String(row[colLicence] || '') : '',
+            email: colEmail !== -1 ? String(row[colEmail] || '') : '',
+            telephone: colTel !== -1 ? String(row[colTel] || '') : '',
+            adresse: colAdresse !== -1 ? String(row[colAdresse] || '') : '',
+            nationalite: colNationalite !== -1 ? String(row[colNationalite] || '') : '',
+            saison: sheetName
+          });
+        }
       }
+    }
+
+    return jsonResponse({ status: 'not_found' });
+  } catch (err) {
+    return jsonResponse({ status: 'error', message: err.message });
+  }
+}
+
+// Trouve l'index d'une colonne par mots-clés (premier match), en excluant certains mots
+function findCol(headers, includes, excludes) {
+  excludes = excludes || [];
+  for (const keyword of includes) {
+    const idx = headers.findIndex(h => h.includes(keyword) && !excludes.some(ex => h.includes(ex)));
+    if (idx !== -1) return idx;
+  }
+  return -1;
+}
+
+// Fonction de test — exécuter depuis l'éditeur pour vérifier
+function testRecherche() {
+  const ss = SpreadsheetApp.openById(CONFIG.SHEET_ADHERENTS);
+  const sheets = ss.getSheets();
+
+  for (const sheet of sheets) {
+    const name = sheet.getName();
+    const lastRow = sheet.getLastRow();
+    Logger.log('Onglet: ' + name + ' — Lignes: ' + lastRow);
+
+    if (lastRow < 2) continue;
+
+    const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+    Logger.log('Headers: ' + JSON.stringify(headers));
+
+    // Afficher les 3 premières lignes de données
+    if (lastRow >= 2) {
+      const rows = sheet.getRange(2, 1, Math.min(3, lastRow - 1), sheet.getLastColumn()).getValues();
+      rows.forEach((row, i) => {
+        Logger.log('Ligne ' + (i+2) + ': nom=' + row[1] + ', prenom=' + row[2] + ', licence=' + row[14]);
+      });
     }
   }
 
-  return jsonResponse({ status: 'not_found' });
+  // Test de recherche
+  const result = handleRechercheAdherent({ nom: 'Ollivon', prenom: 'Kamerone' });
+  Logger.log('Résultat recherche: ' + result.getContent());
 }
 
 // ─── Helpers : Sheets ───────────────────────────────────────────
