@@ -133,11 +133,11 @@ function initCodePostalAutocomplete() {
 
   let debounceTimer;
 
-  // Saisie code postal → suggestions de villes
+  // Saisie code postal (5 chiffres) → remplir la ville
   cpInput.addEventListener('input', () => {
     clearTimeout(debounceTimer);
-    const cp = cpInput.value.trim();
-    if (cp.length < 3) { cpList.style.display = 'none'; return; }
+    const cp = cpInput.value.trim().replace(/\D/g, '');
+    if (cp.length < 5) { cpList.style.display = 'none'; return; }
 
     debounceTimer = setTimeout(async () => {
       try {
@@ -146,27 +146,26 @@ function initCodePostalAutocomplete() {
 
         if (communes.length === 0) { cpList.style.display = 'none'; return; }
 
-        // Si un seul résultat, remplir directement
         if (communes.length === 1) {
           villeInput.value = communes[0].nom;
           cpList.style.display = 'none';
           return;
         }
 
+        // Plusieurs communes pour ce CP → proposer le choix
         cpList.innerHTML = communes.map(c =>
-          `<div class="autocomplete-item" data-ville="${c.nom}" data-cp="${c.codesPostaux[0]}">${c.codesPostaux[0]} — ${c.nom}</div>`
+          `<div class="autocomplete-item" data-ville="${c.nom}" data-cp="${c.codesPostaux[0]}">${c.nom}</div>`
         ).join('');
         cpList.style.display = 'block';
 
         cpList.querySelectorAll('.autocomplete-item').forEach(item => {
           item.addEventListener('click', () => {
-            cpInput.value = item.dataset.cp;
             villeInput.value = item.dataset.ville;
             cpList.style.display = 'none';
           });
         });
       } catch (e) { cpList.style.display = 'none'; }
-    }, 300);
+    }, 200);
   });
 
   // Saisie ville → suggestions avec code postal
