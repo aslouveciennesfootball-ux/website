@@ -129,79 +129,115 @@ function initCodePostalAutocomplete() {
   const cpList = document.getElementById('cpSuggestions');
   const villeList = document.getElementById('villeSuggestions');
 
-  if (!cpInput || !villeInput) return;
+  if (!cpInput || !villeInput) {
+    console.warn('[ASL] CP autocomplete: champs CP/Ville non trouvés');
+    return;
+  }
+  if (!cpList || !villeList) {
+    console.warn('[ASL] CP autocomplete: listes suggestions non trouvées');
+    return;
+  }
+
+  // Désactiver l'autocomplete natif du navigateur qui interfère
+  cpInput.setAttribute('autocomplete', 'off');
+  villeInput.setAttribute('autocomplete', 'off');
 
   let debounceTimer;
+  let lastCpSearched = '';
 
-  // Saisie code postal (5 chiffres) → remplir la ville
-  cpInput.addEventListener('input', () => {
-    clearTimeout(debounceTimer);
-    const cp = cpInput.value.trim().replace(/\D/g, '');
-    if (cp.length < 5) { cpList.style.display = 'none'; return; }
+  function rechercherCP(cp) {
+    if (cp === lastCpSearched) return;
+    lastCpSearched = cp;
+    console.log('[ASL] Recherche CP:', cp);
 
-    debounceTimer = setTimeout(async () => {
-      try {
-        const res = await fetch(`https://geo.api.gouv.fr/communes?codePostal=${cp}&fields=nom,codesPostaux&limit=10`);
-        const communes = await res.json();
+    fetch('https://geo.api.gouv.fr/communes?codePostal=' + cp + '&fields=nom,codesPostaux&limit=10')
+      .then(function(res) { return res.json(); })
+      .then(function(communes) {
+        console.log('[ASL] Résultat API:', communes.length, 'commune(s)');
 
         if (communes.length === 0) { cpList.style.display = 'none'; return; }
 
         if (communes.length === 1) {
           villeInput.value = communes[0].nom;
           cpList.style.display = 'none';
+          // Flash visuel sur le champ ville
+          villeInput.style.backgroundColor = '#d4edda';
+          setTimeout(function() { villeInput.style.backgroundColor = ''; }, 1500);
+          console.log('[ASL] Ville remplie:', communes[0].nom);
           return;
         }
 
         // Plusieurs communes pour ce CP → proposer le choix
-        cpList.innerHTML = communes.map(c =>
-          `<div class="autocomplete-item" data-ville="${c.nom}" data-cp="${c.codesPostaux[0]}">${c.nom}</div>`
-        ).join('');
+        cpList.innerHTML = communes.map(function(c) {
+          return '<div class="autocomplete-item" data-ville="' + c.nom + '" data-cp="' + c.codesPostaux[0] + '">' + c.nom + '</div>';
+        }).join('');
         cpList.style.display = 'block';
 
-        cpList.querySelectorAll('.autocomplete-item').forEach(item => {
-          item.addEventListener('click', () => {
+        cpList.querySelectorAll('.autocomplete-item').forEach(function(item) {
+          item.addEventListener('click', function() {
             villeInput.value = item.dataset.ville;
             cpList.style.display = 'none';
           });
         });
-      } catch (e) { cpList.style.display = 'none'; }
-    }, 200);
-  });
+      })
+      .catch(function(err) {
+        console.warn('[ASL] Erreur API CP:', err);
+        cpList.style.display = 'none';
+      });
+  }
+
+  function onCpChange() {
+    clearTimeout(debounceTimer);
+    var cp = cpInput.value.trim().replace(/\D/g, '');
+    if (cp.length < 5) { cpList.style.display = 'none'; return; }
+
+    debounceTimer = setTimeout(function() { rechercherCP(cp); }, 200);
+  }
+
+  // Écouter input ET keyup ET change pour couvrir tous les navigateurs
+  cpInput.addEventListener('input', onCpChange);
+  cpInput.addEventListener('keyup', onCpChange);
+  cpInput.addEventListener('change', onCpChange);
 
   // Saisie ville → suggestions avec code postal
-  villeInput.addEventListener('input', () => {
+  function onVilleChange() {
     clearTimeout(debounceTimer);
-    const ville = villeInput.value.trim();
+    var ville = villeInput.value.trim();
     if (ville.length < 2) { villeList.style.display = 'none'; return; }
 
-    debounceTimer = setTimeout(async () => {
-      try {
-        const res = await fetch(`https://geo.api.gouv.fr/communes?nom=${encodeURIComponent(ville)}&fields=nom,codesPostaux&limit=8`);
-        const communes = await res.json();
+    debounceTimer = setTimeout(function() {
+      fetch('https://geo.api.gouv.fr/communes?nom=' + encodeURIComponent(ville) + '&fields=nom,codesPostaux&limit=8')
+        .then(function(res) { return res.json(); })
+        .then(function(communes) {
+          if (communes.length === 0) { villeList.style.display = 'none'; return; }
 
-        if (communes.length === 0) { villeList.style.display = 'none'; return; }
+          villeList.innerHTML = communes.map(function(c) {
+            return '<div class="autocomplete-item" data-ville="' + c.nom + '" data-cp="' + c.codesPostaux[0] + '">' + c.nom + ' — ' + c.codesPostaux[0] + '</div>';
+          }).join('');
+          villeList.style.display = 'block';
 
-        villeList.innerHTML = communes.map(c =>
-          `<div class="autocomplete-item" data-ville="${c.nom}" data-cp="${c.codesPostaux[0]}">${c.nom} — ${c.codesPostaux[0]}</div>`
-        ).join('');
-        villeList.style.display = 'block';
-
-        villeList.querySelectorAll('.autocomplete-item').forEach(item => {
-          item.addEventListener('click', () => {
-            villeInput.value = item.dataset.ville;
-            cpInput.value = item.dataset.cp;
-            villeList.style.display = 'none';
+          villeList.querySelectorAll('.autocomplete-item').forEach(function(item) {
+            item.addEventListener('click', function() {
+              villeInput.value = item.dataset.ville;
+              cpInput.value = item.dataset.cp;
+              villeList.style.display = 'none';
+            });
           });
-        });
-      } catch (e) { villeList.style.display = 'none'; }
+        })
+        .catch(function() { villeList.style.display = 'none'; });
     }, 300);
-  });
+  }
+
+  villeInput.addEventListener('input', onVilleChange);
+  villeInput.addEventListener('keyup', onVilleChange);
 
   // Fermer les suggestions quand on clique ailleurs
-  document.addEventListener('click', (e) => {
+  document.addEventListener('click', function(e) {
     if (!e.target.closest('#codePostal') && !e.target.closest('#cpSuggestions')) cpList.style.display = 'none';
     if (!e.target.closest('#ville') && !e.target.closest('#villeSuggestions')) villeList.style.display = 'none';
   });
+
+  console.log('[ASL] CP autocomplete initialisé');
 }
 
 // ─── Recherche adhérent existant ─────────────────────────────────
