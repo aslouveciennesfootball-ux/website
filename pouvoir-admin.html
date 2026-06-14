@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Pouvoirs — AG Football ASL</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Georgia, serif; background: #f5f1eb; color: #1a1a1a; padding: 20px; }
+    .container { max-width: 960px; margin: 0 auto; }
+    h1 { font-size: 22px; text-align: center; margin-bottom: 5px; }
+    .subtitle { text-align: center; font-size: 14px; color: #666; margin-bottom: 30px; }
+
+    .kpis {
+      display: flex; gap: 15px; margin-bottom: 30px; flex-wrap: wrap; justify-content: center;
+    }
+    .kpi {
+      background: #fff; border: 1px solid #ddd; border-radius: 6px;
+      padding: 15px 25px; text-align: center; min-width: 120px;
+    }
+    .kpi .value { font-size: 28px; font-weight: bold; color: #2d5a27; }
+    .kpi .label { font-size: 12px; color: #888; margin-top: 4px; }
+
+    table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 6px; overflow: hidden; }
+    th { background: #2d5a27; color: #fff; font-size: 13px; padding: 10px 12px; text-align: left; }
+    td { padding: 8px 12px; font-size: 13px; border-bottom: 1px solid #eee; }
+    tr:hover td { background: #faf8f5; }
+
+    .badge {
+      display: inline-block; padding: 2px 8px; border-radius: 10px;
+      font-size: 11px; font-weight: bold;
+    }
+    .badge-valide { background: #d4edda; color: #155724; }
+    .badge-code_envoye { background: #cce5ff; color: #004085; }
+    .badge-envoye { background: #e2e3e5; color: #383d41; }
+    .badge-non_envoye { background: #f8d7da; color: #721c24; }
+
+    .mandataires { margin-top: 30px; }
+    .mandataires h2 { font-size: 16px; margin-bottom: 10px; }
+    .mand-item {
+      display: flex; justify-content: space-between; padding: 8px 12px;
+      background: #fff; border-bottom: 1px solid #eee;
+    }
+    .mand-item:first-child { border-radius: 6px 6px 0 0; }
+    .mand-item:last-child { border-radius: 0 0 6px 6px; border-bottom: none; }
+    .mand-count { font-weight: bold; color: #2d5a27; }
+
+    .loading { text-align: center; padding: 40px; color: #888; }
+    .error { text-align: center; padding: 40px; color: #c00; }
+    .actions { text-align: center; margin-top: 20px; }
+    .btn {
+      display: inline-block; margin: 5px; padding: 10px 20px;
+      background: #2d5a27; color: #fff; border: none; border-radius: 4px;
+      cursor: pointer; font-family: Georgia, serif; font-size: 14px;
+    }
+    .btn:hover { background: #3d7a35; }
+    @media print {
+      .actions, .btn { display: none; }
+      body { background: #fff; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Pouvoirs — AG Football ASL</h1>
+  <div class="subtitle">1er juillet 2026</div>
+
+  <div class="kpis">
+    <div class="kpi"><div class="value" id="kpi-total">-</div><div class="label">Total</div></div>
+    <div class="kpi"><div class="value" id="kpi-valides">-</div><div class="label">Valid&eacute;s</div></div>
+    <div class="kpi"><div class="value" id="kpi-code">-</div><div class="label">Code envoy&eacute;</div></div>
+    <div class="kpi"><div class="value" id="kpi-envoyes">-</div><div class="label">Envoy&eacute;s</div></div>
+    <div class="kpi"><div class="value" id="kpi-non">-</div><div class="label">Non envoy&eacute;s</div></div>
+  </div>
+
+  <div class="loading" id="loading">Chargement des donn&eacute;es...</div>
+  <div class="error" id="error" style="display:none;"></div>
+
+  <table style="display:none;" id="tableau">
+    <thead>
+      <tr>
+        <th>Adh&eacute;rent</th>
+        <th>Cat.</th>
+        <th>Type</th>
+        <th>Mandataire</th>
+        <th>Date confirmation</th>
+        <th>Statut</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+
+  <div class="mandataires" id="mandataires-section" style="display:none;">
+    <h2>Pouvoirs par mandataire</h2>
+    <div id="mandataires-list"></div>
+  </div>
+
+  <div class="actions">
+    <button class="btn" onclick="window.print()">Imprimer</button>
+    <button class="btn" onclick="charger()">Actualiser</button>
+  </div>
+</div>
+
+<script>
+  var API = 'https://script.google.com/macros/s/AKfycbyc_DgCnyozzk9dZv0m7pDA4-kZ_ktx5Co30LX0dLr5tROChaJ7fKYXtNvDJBBnoCf6Sg/exec';
+
+  function charger() {
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('tableau').style.display = 'none';
+    document.getElementById('mandataires-section').style.display = 'none';
+    document.getElementById('error').style.display = 'none';
+
+    fetch(API + '?action=admin')
+      .then(function(r) { return r.json(); })
+      .then(render)
+      .catch(function(e) {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('error').style.display = 'block';
+        document.getElementById('error').textContent = 'Erreur : ' + e.message;
+      });
+  }
+
+  function render(rows) {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('tableau').style.display = 'table';
+
+    var total = rows.length;
+    var valides = 0, code = 0, envoyes = 0, non = 0;
+    var mandataires = {};
+    var tbody = document.getElementById('tbody');
+    tbody.innerHTML = '';
+
+    rows.forEach(function(r) {
+      if (r.statut === 'valide') valides++;
+      else if (r.statut === 'code_envoye') code++;
+      else if (r.statut === 'envoye') envoyes++;
+      else non++;
+
+      if (r.mandataire && r.statut === 'valide') {
+        mandataires[r.mandataire] = (mandataires[r.mandataire] || 0) + 1;
+      }
+
+      var tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td><strong>' + r.prenom + ' ' + r.nom + '</strong></td>' +
+        '<td>' + (r.categorie || '') + '</td>' +
+        '<td>' + r.type + '</td>' +
+        '<td>' + (r.mandataire || '') + '</td>' +
+        '<td>' + (r.dateConfirmation || '') + '</td>' +
+        '<td><span class="badge badge-' + r.statut + '">' + r.statut.replace(/_/g, ' ') + '</span></td>';
+      tbody.appendChild(tr);
+    });
+
+    document.getElementById('kpi-total').textContent = total;
+    document.getElementById('kpi-valides').textContent = valides;
+    document.getElementById('kpi-code').textContent = code;
+    document.getElementById('kpi-envoyes').textContent = envoyes;
+    document.getElementById('kpi-non').textContent = non;
+
+    var mandKeys = Object.keys(mandataires).sort(function(a, b) {
+      return mandataires[b] - mandataires[a];
+    });
+
+    if (mandKeys.length > 0) {
+      document.getElementById('mandataires-section').style.display = 'block';
+      var list = document.getElementById('mandataires-list');
+      list.innerHTML = '';
+      mandKeys.forEach(function(m) {
+        var div = document.createElement('div');
+        div.className = 'mand-item';
+        div.innerHTML = '<span>' + m + '</span><span class="mand-count">' + mandataires[m] + ' pouvoir(s)</span>';
+        list.appendChild(div);
+      });
+    }
+  }
+
+  charger();
+</script>
+
+</body>
+</html>
