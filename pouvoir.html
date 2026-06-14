@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pouvoir de vote — AG Football ASL</title>
+  <style>
+    body {
+      font-family: Georgia, serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background: #f5f1eb;
+      color: #1a1a1a;
+      text-align: center;
+      padding: 20px;
+    }
+    .msg { font-size: 16px; color: #666; }
+    a { color: #2d5a27; }
+  </style>
+</head>
+<body>
+  <div>
+    <div class="msg">Redirection en cours...</div>
+    <noscript>
+      <p>JavaScript est requis. <a id="fallback-link">Cliquez ici</a> si la redirection ne fonctionne pas.</p>
+    </noscript>
+  </div>
+  <script>
+    (function() {
+      var params = new URLSearchParams(window.location.search);
+      var token = params.get('token');
+      var cancel = params.get('cancel');
+      var admin = params.get('admin');
+      var base = 'https://script.google.com/macros/s/AKfycbyc_DgCnyozzk9dZv0m7pDA4-kZ_ktx5Co30LX0dLr5tROChaJ7fKYXtNvDJBBnoCf6Sg/exec';
+      var url = base;
+      if (token) url += '?token=' + encodeURIComponent(token);
+      else if (cancel) url += '?cancel=' + encodeURIComponent(cancel);
+      else if (admin) url += '?admin=1';
+      window.location.replace(url);
+    })();
+  </script>
+</body>
+</html>
