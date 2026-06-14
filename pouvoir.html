@@ -3,44 +3,294 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pouvoir de vote — AG Football ASL</title>
+  <title>Pouvoir de vote — AG Section Football ASL</title>
   <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: Georgia, serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      margin: 0;
-      background: #f5f1eb;
-      color: #1a1a1a;
-      text-align: center;
-      padding: 20px;
+      font-family: Georgia, 'Times New Roman', serif;
+      background: #f5f1eb; color: #1a1a1a;
+      min-height: 100vh; display: flex; justify-content: center; padding: 20px;
     }
-    .msg { font-size: 16px; color: #666; }
-    a { color: #2d5a27; }
+    .container { max-width: 600px; width: 100%; margin-top: 20px; }
+    .header { text-align: center; margin-bottom: 30px; }
+    .header .logo { font-size: 14px; letter-spacing: 3px; text-transform: uppercase; color: #888; margin-bottom: 8px; }
+    .header h1 { font-size: 22px; font-weight: normal; line-height: 1.4; }
+    .header .date { font-size: 14px; color: #666; margin-top: 4px; }
+    .card {
+      background: #fff; border: 1px solid #ddd; border-radius: 6px;
+      padding: 30px; margin-bottom: 20px;
+    }
+    .card h2 { font-size: 16px; font-weight: bold; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
+    .adherent-info {
+      background: #faf8f5; border-left: 3px solid #2d5a27;
+      padding: 15px 20px; margin-bottom: 20px; font-size: 15px; line-height: 1.6;
+    }
+    .adherent-info .nom { font-weight: bold; font-size: 17px; }
+    .adherent-info .categorie { color: #666; font-size: 13px; }
+    .procuration-text { font-size: 14px; line-height: 1.8; margin-bottom: 25px; text-align: justify; }
+    .procuration-text em { font-style: normal; font-weight: bold; }
+    .field-group { margin-bottom: 20px; }
+    .field-group label { display: block; font-size: 14px; font-weight: bold; margin-bottom: 6px; }
+    .field-group .hint { font-size: 12px; color: #888; margin-bottom: 8px; }
+    .field-group input {
+      width: 100%; padding: 12px 15px; font-size: 16px; font-family: Georgia, serif;
+      border: 1px solid #ccc; border-radius: 4px; background: #faf8f5; transition: border-color 0.2s;
+    }
+    .field-group input:focus { outline: none; border-color: #2d5a27; background: #fff; }
+    .legal-notice {
+      font-size: 12px; color: #888; line-height: 1.6; margin-bottom: 25px;
+      padding: 12px 15px; background: #faf8f5; border-radius: 4px;
+    }
+    .btn {
+      display: block; width: 100%; padding: 15px; font-size: 16px;
+      font-family: Georgia, serif; font-weight: bold; color: #fff;
+      background: #2d5a27; border: none; border-radius: 4px; cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn:hover { background: #1e3d1a; }
+    .btn:disabled { background: #aaa; cursor: not-allowed; }
+    .security-info { text-align: center; font-size: 12px; color: #999; margin-top: 20px; line-height: 1.5; }
+
+    .hidden { display: none; }
+    .loading { text-align: center; padding: 40px; color: #666; font-size: 15px; }
+    .confirmation { text-align: center; padding: 40px 20px; }
+    .confirmation .check { font-size: 48px; color: #2d5a27; margin-bottom: 15px; }
+    .confirmation h2 { border: none; padding: 0; margin-bottom: 10px; }
+    .confirmation .recap { font-size: 15px; line-height: 1.8; color: #444; margin-top: 15px; }
+    .confirmation .recap strong { color: #1a1a1a; }
+    .confirmation .delai {
+      background: #fff8e6; border: 1px solid #f0dca0; border-radius: 6px;
+      padding: 12px 15px; margin-top: 20px; font-size: 13px; color: #8a6d00;
+    }
+    .status-used { text-align: center; padding: 30px 20px; }
+    .status-used .icon { font-size: 48px; color: #c57b1a; margin-bottom: 15px; }
+    .status-used .recap { font-size: 15px; line-height: 1.8; color: #444; margin-top: 15px; }
+    .status-used .recap strong { color: #1a1a1a; }
+    .status-error { text-align: center; padding: 30px 20px; }
+    .status-error .icon { font-size: 48px; color: #c0392b; margin-bottom: 15px; }
+    .cancel-ok { text-align: center; padding: 40px 20px; }
+    .cancel-ok .check { font-size: 48px; color: #2d5a27; margin-bottom: 15px; }
+    .cancel-ok .recap { font-size: 15px; line-height: 1.8; color: #444; margin-top: 15px; }
+    @media (max-width: 480px) { .card { padding: 20px 15px; } .header h1 { font-size: 18px; } }
   </style>
 </head>
 <body>
-  <div>
-    <div class="msg">Redirection en cours...</div>
-    <noscript>
-      <p>JavaScript est requis. <a id="fallback-link">Cliquez ici</a> si la redirection ne fonctionne pas.</p>
-    </noscript>
+
+<div class="container">
+  <div class="header">
+    <div class="logo">Association Sportive de Louveciennes</div>
+    <h1>Pouvoir de vote<br>Assembl&#233;e G&#233;n&#233;rale &#8212; Section Football</h1>
+    <div class="date">1er juillet 2026 &#224; 18h30 &#8212; Stade du C&#339;ur Volant</div>
   </div>
-  <script>
-    (function() {
-      var params = new URLSearchParams(window.location.search);
-      var token = params.get('token');
-      var cancel = params.get('cancel');
-      var admin = params.get('admin');
-      var base = 'https://script.google.com/macros/s/AKfycbyc_DgCnyozzk9dZv0m7pDA4-kZ_ktx5Co30LX0dLr5tROChaJ7fKYXtNvDJBBnoCf6Sg/exec';
-      var url = base;
-      if (token) url += '?token=' + encodeURIComponent(token);
-      else if (cancel) url += '?cancel=' + encodeURIComponent(cancel);
-      else if (admin) url += '?admin=1';
-      window.location.replace(url);
-    })();
-  </script>
+
+  <!-- Chargement -->
+  <div class="card loading" id="loading-card">
+    Chargement...
+  </div>
+
+  <!-- Formulaire -->
+  <div class="card hidden" id="form-card">
+    <h2>D&#233;signation du mandataire</h2>
+
+    <div class="adherent-info">
+      <div class="nom" id="adherent-nom"></div>
+      <div class="categorie" id="adherent-cat"></div>
+    </div>
+
+    <div class="procuration-text">
+      Je soussign&#233;(e), agissant en qualit&#233; de repr&#233;sentant l&#233;gal de
+      <em id="text-adherent"></em>,
+      membre de la section Football de l'ASL, donne pouvoir &#224; la personne
+      d&#233;sign&#233;e ci-dessous pour me repr&#233;senter &#224; l'assembl&#233;e g&#233;n&#233;rale
+      du 1er juillet 2026 et voter en mon nom sur toutes les
+      r&#233;solutions inscrites &#224; l'ordre du jour.
+    </div>
+
+    <div class="field-group">
+      <label for="mandataire">Nom et pr&#233;nom du mandataire</label>
+      <div class="hint">La personne qui votera en votre nom lors de l'assembl&#233;e</div>
+      <input type="text" id="mandataire" placeholder="ex : C&#233;line ERRADI" autocomplete="name">
+    </div>
+
+    <div class="legal-notice">
+      Ce pouvoir est valable uniquement pour l'assembl&#233;e g&#233;n&#233;rale de la section
+      Football de l'ASL du 1er juillet 2026. Il est r&#233;vocable dans les 3 minutes
+      suivant la validation via le lien envoy&#233; dans l'email de confirmation.
+      Ce formulaire ne constitue pas un acte juridique opposable aux tiers.
+    </div>
+
+    <button class="btn" id="btn-confirm" disabled onclick="confirmer()">
+      Je confirme donner pouvoir
+    </button>
+  </div>
+
+  <!-- Envoi en cours -->
+  <div class="card hidden" id="spinner-card">
+    <div class="loading">Enregistrement en cours...</div>
+  </div>
+
+  <!-- Confirmation -->
+  <div class="card confirmation hidden" id="confirmation-card">
+    <div class="check">&#10003;</div>
+    <h2>Pouvoir enregistr&#233;</h2>
+    <div class="recap">
+      Le pouvoir de vote de <strong id="recap-adherent"></strong>
+      a &#233;t&#233; donn&#233; &#224; <strong id="recap-mandataire"></strong>.<br><br>
+      Enregistr&#233; le <strong id="recap-date"></strong>.
+    </div>
+    <div class="delai">
+      &#9200; Un email de confirmation vous a &#233;t&#233; envoy&#233;.<br>
+      Vous disposez de <strong>3 minutes</strong> pour annuler via le lien dans cet email.
+    </div>
+  </div>
+
+  <!-- Deja utilise -->
+  <div class="card status-used hidden" id="used-card">
+    <div class="icon">&#9888;</div>
+    <h2>Pouvoir d&#233;j&#224; enregistr&#233;</h2>
+    <div class="recap">
+      Ce pouvoir a d&#233;j&#224; &#233;t&#233; donn&#233; &#224; <strong id="used-mandataire"></strong>
+      le <strong id="used-date"></strong>.<br><br>
+      Si vous souhaitez modifier votre choix, contactez le bureau de la section.
+    </div>
+  </div>
+
+  <!-- Annulation OK -->
+  <div class="card cancel-ok hidden" id="cancel-card">
+    <div class="check">&#10003;</div>
+    <h2>Pouvoir annul&#233;</h2>
+    <div class="recap" id="cancel-message"></div>
+  </div>
+
+  <!-- Erreur -->
+  <div class="card status-error hidden" id="error-card">
+    <div class="icon">&#10060;</div>
+    <h2>Erreur</h2>
+    <div class="recap" id="error-message">Lien invalide ou expir&#233;.</div>
+  </div>
+
+  <div class="security-info">
+    &#128274; Lien personnel et s&#233;curis&#233;<br>
+    Li&#233; &#224; votre adh&#233;sion &#8212; usage unique &#8212; connexion chiffr&#233;e
+  </div>
+</div>
+
+<script>
+  var API = 'https://script.google.com/macros/s/AKfycbyc_DgCnyozzk9dZv0m7pDA4-kZ_ktx5Co30LX0dLr5tROChaJ7fKYXtNvDJBBnoCf6Sg/exec';
+  var params = new URLSearchParams(window.location.search);
+  var token = params.get('token');
+  var cancel = params.get('cancel');
+  var currentData = null;
+
+  function show(id) {
+    document.querySelectorAll('.card').forEach(function(c) { c.classList.add('hidden'); });
+    document.getElementById(id).classList.remove('hidden');
+  }
+
+  function apiGet(action, tkn) {
+    return fetch(API + '?action=' + action + '&token=' + encodeURIComponent(tkn))
+      .then(function(r) { return r.json(); });
+  }
+
+  function apiPost(data) {
+    return fetch(API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(data)
+    }).then(function(r) { return r.json(); });
+  }
+
+  // Init
+  if (cancel) {
+    apiGet('cancel', cancel).then(function(result) {
+      if (result.ok) {
+        document.getElementById('cancel-message').innerHTML =
+          'Votre pouvoir pour <strong>' + result.nom + '</strong> a bien &#233;t&#233; annul&#233;.<br><br>' +
+          'Vous pouvez utiliser votre lien initial pour d&#233;signer un nouveau mandataire.';
+        show('cancel-card');
+      } else {
+        var msg = 'Annulation impossible. ';
+        if (result.reason === 'expired') msg += 'Le d&#233;lai de 3 minutes est d&#233;pass&#233;.';
+        else if (result.reason === 'not_pending') msg += 'Ce pouvoir est d&#233;j&#224; confirm&#233; ou n\'a pas encore &#233;t&#233; valid&#233;.';
+        else msg += 'Lien invalide.';
+        document.getElementById('error-message').textContent = msg;
+        show('error-card');
+      }
+    }).catch(function() {
+      document.getElementById('error-message').textContent = 'Erreur de connexion. R&#233;essayez.';
+      show('error-card');
+    });
+
+  } else if (token) {
+    apiGet('info', token).then(function(data) {
+      if (data.error) {
+        show('error-card');
+        return;
+      }
+
+      currentData = data;
+      var nomComplet = data.prenom + ' ' + data.nom;
+      document.getElementById('adherent-nom').textContent = nomComplet;
+      document.getElementById('text-adherent').textContent = nomComplet;
+
+      var catText = '';
+      if (data.type === 'dirigeant') catText = 'Dirigeant(e)';
+      else if (data.categorie) catText = 'Cat\u00e9gorie ' + data.categorie + ' \u2014 Adh\u00e9rent repr\u00e9sent\u00e9 par son ascendant';
+      document.getElementById('adherent-cat').textContent = catText;
+
+      if (data.statut === 'valide' || data.statut === 'en_attente') {
+        document.getElementById('used-mandataire').textContent = data.mandataire;
+        document.getElementById('used-date').textContent = data.dateValidation;
+        show('used-card');
+      } else {
+        show('form-card');
+      }
+    }).catch(function() {
+      document.getElementById('error-message').textContent = 'Erreur de connexion. R\u00e9essayez.';
+      show('error-card');
+    });
+
+  } else {
+    document.getElementById('error-message').textContent = 'Lien invalide \u2014 aucun token fourni.';
+    show('error-card');
+  }
+
+  // Input
+  var input = document.getElementById('mandataire');
+  var btn = document.getElementById('btn-confirm');
+  input.addEventListener('input', function() {
+    btn.disabled = this.value.trim().length < 3;
+  });
+
+  function confirmer() {
+    var mandataire = input.value.trim();
+    if (mandataire.length < 3 || !currentData) return;
+
+    btn.disabled = true;
+    show('spinner-card');
+
+    apiPost({ action: 'valider', token: currentData.token, mandataire: mandataire })
+      .then(function(result) {
+        if (result.ok) {
+          document.getElementById('recap-adherent').textContent = result.nom;
+          document.getElementById('recap-mandataire').textContent = result.mandataire;
+          document.getElementById('recap-date').textContent = result.date;
+          show('confirmation-card');
+        } else if (result.reason === 'already_done' || result.reason === 'pending') {
+          document.getElementById('used-mandataire').textContent = result.mandataire;
+          document.getElementById('used-date').textContent = result.date;
+          show('used-card');
+        } else {
+          document.getElementById('error-message').textContent = 'Erreur lors de la validation.';
+          show('error-card');
+        }
+      })
+      .catch(function() {
+        document.getElementById('error-message').textContent = 'Erreur de connexion. R\u00e9essayez.';
+        show('error-card');
+      });
+  }
+</script>
+
 </body>
 </html>
