@@ -86,6 +86,7 @@
         <th>Mandataire</th>
         <th>Date confirmation</th>
         <th>Statut</th>
+        <th>PDF</th>
       </tr>
     </thead>
     <tbody id="tbody"></tbody>
@@ -148,7 +149,8 @@
         '<td>' + r.type + '</td>' +
         '<td>' + (r.mandataire || '') + '</td>' +
         '<td>' + (r.dateConfirmation || '') + '</td>' +
-        '<td><span class="badge badge-' + r.statut + '">' + r.statut.replace(/_/g, ' ') + '</span></td>';
+        '<td><span class="badge badge-' + r.statut + '">' + r.statut.replace(/_/g, ' ') + '</span></td>' +
+        '<td>' + (r.lienPdf ? '<a href="' + r.lienPdf + '" target="_blank" style="color:#2d5a27;">Voir</a>' : '') + '</td>';
       tbody.appendChild(tr);
     });
 
